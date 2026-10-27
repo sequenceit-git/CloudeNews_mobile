@@ -38,6 +38,12 @@ abstract class TencentConferenceUikitPlatform extends PlatformInterface {
   Future<void> stopForegroundService(ForegroundServiceType type) async {
     await instance.stopForegroundService(type);
   }
+
+  /// Opens the iOS "Start Broadcast" sheet. Returns false if the app has no
+  /// broadcast extension to share with.
+  Future<bool> showScreenSharePicker() async {
+    return instance.showScreenSharePicker();
+  }
 }
 
 enum ForegroundServiceType { video, audio, media }

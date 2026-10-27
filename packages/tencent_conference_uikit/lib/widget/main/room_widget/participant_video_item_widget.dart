@@ -42,7 +42,14 @@ class _ParticipantVideoItemWidgetState extends State<ParticipantVideoItemWidget>
       participant: widget.participant,
     );
     _controller.setFillMode(widget.isScreenStream ? FillMode.fit : FillMode.fill);
-    _controller.setActive(true);
+    _controller.setActive(roomPopupDepth.value == 0);
+    roomPopupDepth.addListener(_syncVideoSurface);
+  }
+
+  void _syncVideoSurface() {
+    if (!mounted) return;
+    _controller.setActive(roomPopupDepth.value == 0);
+    setState(() {});
   }
 
   @override
@@ -78,6 +85,7 @@ class _ParticipantVideoItemWidgetState extends State<ParticipantVideoItemWidget>
 
   @override
   void dispose() {
+    roomPopupDepth.removeListener(_syncVideoSurface);
     _controller.setActive(false);
     super.dispose();
   }
@@ -85,6 +93,10 @@ class _ParticipantVideoItemWidgetState extends State<ParticipantVideoItemWidget>
 
 extension _ParticipantVideoItemWidgetStatePrivate on _ParticipantVideoItemWidgetState {
   Widget _buildContent(RoomParticipant currentParticipant) {
+    if (roomPopupDepth.value > 0) {
+      return SizedBox(width: widget.width, height: widget.height);
+    }
+
     final hasVideo = widget.isScreenStream
         ? currentParticipant.screenShareStatus == DeviceStatus.on
         : currentParticipant.cameraStatus == DeviceStatus.on;
@@ -100,7 +112,7 @@ extension _ParticipantVideoItemWidgetStatePrivate on _ParticipantVideoItemWidget
             alignment: Alignment.center,
             fit: StackFit.expand,
             children: [
-              RoomParticipantWidget(controller: _controller),
+              if (roomPopupDepth.value == 0) RoomParticipantWidget(controller: _controller),
               if (!hasVideo && !widget.isScreenStream) ...[
                 Container(color: const Color(0x8022262E)),
                 Center(

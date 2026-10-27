@@ -37,20 +37,41 @@
 	</array>
 	<key>CFBundleVersion</key>
 	<string>$(FLUTTER_BUILD_NUMBER)</string>
+	<key>ITSAppUsesNonExemptEncryption</key>
+	<false/>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
+	<key>NSBluetoothAlwaysUsageDescription</key>
+	<string>CloudNews uses Bluetooth for audio accessories during meetings</string>
 	<key>NSCameraUsageDescription</key>
 	<string>CloudNews needs camera access for video meetings</string>
 	<key>NSMicrophoneUsageDescription</key>
 	<string>CloudNews needs microphone access for video meetings</string>
-	<key>NSBluetoothAlwaysUsageDescription</key>
-	<string>CloudNews uses Bluetooth for audio accessories during meetings</string>
-	<key>NSPhotoLibraryUsageDescription</key>
-	<string>CloudNews needs photo library access to send images in meeting chat</string>
 	<key>NSPhotoLibraryAddUsageDescription</key>
 	<string>CloudNews needs permission to save images from meeting chat</string>
-	<key>ITSAppUsesNonExemptEncryption</key>
-	<false/>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>CloudNews needs photo library access to send images in meeting chat</string>
+	<key>UIApplicationSceneManifest</key>
+	<dict>
+		<key>UIApplicationSupportsMultipleScenes</key>
+		<false/>
+		<key>UISceneConfigurations</key>
+		<dict>
+			<key>UIWindowSceneSessionRoleApplication</key>
+			<array>
+				<dict>
+					<key>UISceneClassName</key>
+					<string>UIWindowScene</string>
+					<key>UISceneConfigurationName</key>
+					<string>flutter</string>
+					<key>UISceneDelegateClassName</key>
+					<string>FlutterSceneDelegate</string>
+					<key>UISceneStoryboardFile</key>
+					<string>Main</string>
+				</dict>
+			</array>
+		</dict>
+	</dict>
 	<key>UIApplicationSupportsIndirectInputEvents</key>
 	<true/>
 	<key>UIBackgroundModes</key>

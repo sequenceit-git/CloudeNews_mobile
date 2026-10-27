@@ -1,21 +1,26 @@
 import ReplayKit
 import TXLiteAVSDK_ReplayKitExt
 
-/// Must match the App Group on both the Runner target and this extension,
-/// and the string passed to DeviceStore.startScreenShare(iOSAppGroup:).
-let APPGROUP = "group.com.cloudnews.app"
+/// Empty skips the App Group. The main app passes the same empty value to
+/// DeviceStore.startScreenShare(iOSAppGroup:). Sharing can start, with less
+/// stable cross-process delivery than a configured App Group.
+let APPGROUP = ""
 
 class SampleHandler: RPBroadcastSampleHandler, TXReplayKitExtDelegate {
   override func broadcastStarted(withSetupInfo setupInfo: [String: NSObject]?) {
     TXReplayKitExt.sharedInstance().setup(withAppGroup: APPGROUP, delegate: self)
   }
 
-  override func broadcastPaused() {}
+  override func broadcastPaused() {
+    TXReplayKitExt.sharedInstance().broadcastPaused()
+  }
 
-  override func broadcastResumed() {}
+  override func broadcastResumed() {
+    TXReplayKitExt.sharedInstance().broadcastResumed()
+  }
 
   override func broadcastFinished() {
-    TXReplayKitExt.sharedInstance().finishBroadcast()
+    TXReplayKitExt.sharedInstance().broadcastFinished()
   }
 
   func broadcastFinished(_ broadcast: TXReplayKitExt, reason: TXReplayKitExtReason) {
@@ -40,9 +45,9 @@ class SampleHandler: RPBroadcastSampleHandler, TXReplayKitExtDelegate {
 
   override func processSampleBuffer(_ sampleBuffer: CMSampleBuffer, with sampleBufferType: RPSampleBufferType) {
     switch sampleBufferType {
-    case .video:
-      TXReplayKitExt.sharedInstance().sendVideoSampleBuffer(sampleBuffer)
-    case .audioApp, .audioMic:
+    case .video, .audioApp:
+      TXReplayKitExt.sharedInstance().send(sampleBuffer, with: sampleBufferType)
+    case .audioMic:
       break
     @unknown default:
       break

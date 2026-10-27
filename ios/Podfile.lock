@@ -1,0 +1,121 @@
+PODS:
+  - AlbumPicker (1.0.8):
+    - AlbumPickerCore (= 1.0.8)
+  - AlbumPickerCore (1.0.8):
+    - TXIMSDK_Plus_iOS_XCFramework
+  - atomic_x_core (0.0.1):
+    - Flutter
+  - Flutter (1.0.0)
+  - HydraAsync (2.0.6)
+  - live_uikit_barrage (0.0.1):
+    - Flutter
+  - Masonry (1.1.0)
+  - rtc_room_engine_impl (4.3.1):
+    - Flutter
+    - RTCRoomEngine/Professional (~> 4.3.0)
+  - RTCRoomEngine/Professional (4.3.11):
+    - TXIMSDK_Plus_iOS_XCFramework (>= 8.4.6676)
+    - TXLiteAVSDK_Professional (>= 12.8.0.19666)
+  - super_player (13.5.0):
+    - Flutter
+    - super_player/bare (= 13.5.0)
+  - super_player/bare (13.5.0):
+    - Flutter
+  - super_player/professional (13.5.0):
+    - Flutter
+    - TXLiteAVSDK_Professional
+  - tencent_chat_uikit (1.0.0):
+    - AlbumPickerCore (~> 1.0)
+    - Flutter
+    - Masonry
+    - tuikit_atomic_x
+  - tencent_cloud_chat_sdk (8.0.0):
+    - Flutter
+    - HydraAsync
+    - TXIMSDK_Plus_iOS_XCFramework (~> 9.1.7822)
+  - tencent_conference_uikit (0.0.1):
+    - Flutter
+  - tencent_rtc_sdk (0.0.1):
+    - Flutter
+    - super_player/professional
+    - TXCustomBeautyProcesserPlugin (= 1.0.2)
+    - TXLiteAVSDK_Professional (= 13.5.21355)
+  - tuikit_atomic_x (0.0.1):
+    - AlbumPicker (~> 1.0)
+    - Flutter
+  - TXCustomBeautyProcesserPlugin (1.0.2)
+  - TXIMSDK_Plus_iOS_XCFramework (9.1.7824)
+  - TXLiteAVSDK_Professional (13.5.21355):
+    - TXLiteAVSDK_Professional/Professional (= 13.5.21355)
+  - TXLiteAVSDK_Professional/Professional (13.5.21355)
+  - TXLiteAVSDK_Professional/ReplayKitExt (13.5.21355)
+
+DEPENDENCIES:
+  - atomic_x_core (from `.symlinks/plugins/atomic_x_core/ios`)
+  - Flutter (from `Flutter`)
+  - live_uikit_barrage (from `.symlinks/plugins/live_uikit_barrage/ios`)
+  - rtc_room_engine_impl (from `.symlinks/plugins/rtc_room_engine_impl/ios`)
+  - super_player (from `.symlinks/plugins/super_player/ios`)
+  - tencent_chat_uikit (from `.symlinks/plugins/tencent_chat_uikit/ios`)
+  - tencent_cloud_chat_sdk (from `.symlinks/plugins/tencent_cloud_chat_sdk/ios`)
+  - tencent_conference_uikit (from `.symlinks/plugins/tencent_conference_uikit/ios`)
+  - tencent_rtc_sdk (from `.symlinks/plugins/tencent_rtc_sdk/ios`)
+  - tuikit_atomic_x (from `.symlinks/plugins/tuikit_atomic_x/ios`)
+  - TXLiteAVSDK_Professional/ReplayKitExt (= 13.5.21355)
+
+SPEC REPOS:
+  trunk:
+    - AlbumPicker
+    - AlbumPickerCore
+    - HydraAsync
+    - Masonry
+    - RTCRoomEngine
+    - TXCustomBeautyProcesserPlugin
+    - TXIMSDK_Plus_iOS_XCFramework
+    - TXLiteAVSDK_Professional
+
+EXTERNAL SOURCES:
+  atomic_x_core:
+    :path: ".symlinks/plugins/atomic_x_core/ios"
+  Flutter:
+    :path: Flutter
+  live_uikit_barrage:
+    :path: ".symlinks/plugins/live_uikit_barrage/ios"
+  rtc_room_engine_impl:
+    :path: ".symlinks/plugins/rtc_room_engine_impl/ios"
+  super_player:
+    :path: ".symlinks/plugins/super_player/ios"
+  tencent_chat_uikit:
+    :path: ".symlinks/plugins/tencent_chat_uikit/ios"
+  tencent_cloud_chat_sdk:
+    :path: ".symlinks/plugins/tencent_cloud_chat_sdk/ios"
+  tencent_conference_uikit:
+    :path: ".symlinks/plugins/tencent_conference_uikit/ios"
+  tencent_rtc_sdk:
+    :path: ".symlinks/plugins/tencent_rtc_sdk/ios"
+  tuikit_atomic_x:
+    :path: ".symlinks/plugins/tuikit_atomic_x/ios"
+
+SPEC CHECKSUMS:
+  AlbumPicker: 812fc5e6aeba0c0877bbc125e030ca1efbfdf109
+  AlbumPickerCore: 6b2819051b1b30e0764c271924f22181226cec14
+  atomic_x_core: 9ab26b4f42d08021f68ba622a35835e1f58cc463
+  Flutter: 71a624a5bc0c04062bf19101d501e466baf2fb47
+  HydraAsync: 8d589bd725b0224f899afafc9a396327405f8063
+  live_uikit_barrage: 802347020bcceb9a0ac6a6a81002e55e4c6588e4
+  Masonry: 678fab65091a9290e40e2832a55e7ab731aad201
+  rtc_room_engine_impl: 4201cb5dfbcd75b68ab3d0e08b166ae6ef74c058
+  RTCRoomEngine: 27728def998534f35d48dfa59bac60e74219ea3c
+  super_player: 5080d7232ba3c0536ae341e6980fc17bcc5cd47b
+  tencent_chat_uikit: 00da2af122c8198da6c43dc6af4f56fda56e9484
+  tencent_cloud_chat_sdk: 103ae90a2c6ca13fc99f25d87eea064e72f03395
+  tencent_conference_uikit: b6be5eadad54782f7f0ce528f7f2ed0325e93ae9
+  tencent_rtc_sdk: 3932e0b18093c31c0f605aa3a5890830fe9f9d1b
+  tuikit_atomic_x: 795c34b2e2bfe50dd3cb62ecde63c0d44e6aa999
+  TXCustomBeautyProcesserPlugin: 099393b941cb40eda12b3a80bf6c0319957b1cfd
+  TXIMSDK_Plus_iOS_XCFramework: 4f615c07f10b76d7ff236bc4c241685f7a0cb16c
+  TXLiteAVSDK_Professional: 914aa2e59545c8cdff80ab70c1bc8191c683ecfc
+
+PODFILE CHECKSUM: 9e82282b148844557fe55ee48be25c528694086a
+
+COCOAPODS: 1.16.2

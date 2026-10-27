@@ -31,6 +31,15 @@ class MethodChannelTencentConferenceUikit extends TencentConferenceUikitPlatform
   }
 
   @override
+  Future<bool> showScreenSharePicker() async {
+    if (!Platform.isIOS) {
+      return true;
+    }
+    final shown = await methodChannel.invokeMethod<bool>('showScreenSharePicker');
+    return shown ?? false;
+  }
+
+  @override
   Future<void> stopForegroundService(ForegroundServiceType type) async {
     if (Platform.isAndroid) {
       await methodChannel.invokeMethod('stopForegroundService', {'serviceType': type.index});

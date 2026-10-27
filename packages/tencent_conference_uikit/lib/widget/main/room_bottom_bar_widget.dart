@@ -1,5 +1,3 @@
-import 'dart:io';
-
 import 'package:tuikit_atomic_x/atomicx.dart';
 import 'package:flutter/material.dart' hide AlertDialog;
 import 'package:tencent_conference_uikit/base/index.dart';
@@ -202,7 +200,7 @@ class _RoomBottomBarWidgetState extends State<RoomBottomBarWidget> {
     );
   }
 
-  void _handleScreenShareToggle() {
+  Future<void> _handleScreenShareToggle() async {
     final deviceStore = DeviceStore.shared;
     if (deviceStore.state.screenStatus.value == DeviceStatus.on) {
       deviceStore.stopScreenShare();
@@ -226,8 +224,15 @@ class _RoomBottomBarWidgetState extends State<RoomBottomBarWidget> {
       return;
     }
     deviceStore.startScreenShare(
-      iOSAppGroup: Platform.isIOS ? 'group.com.cloudnews.app' : '',
+      iOSAppGroup: '',
     );
+    final pickerShown = await TencentConferenceUikitPlatform.instance.showScreenSharePicker();
+    if (!pickerShown) {
+      deviceStore.stopScreenShare();
+      if (mounted) {
+        Toast.warning(context, localizations.roomkit_err_n1109_screen_share_start_failed, useRootOverlay: true);
+      }
+    }
   }
 
   Widget _buildAIToolsButton() {
