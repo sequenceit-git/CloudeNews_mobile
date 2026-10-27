@@ -1,0 +1,7 @@
+CFBundleDisplayName = "云新闻";
+CFBundleName = "云新闻";
+NSCameraUsageDescription = "云新闻需要使用摄像头进行视频会议";
+NSMicrophoneUsageDescription = "云新闻需要使用麦克风进行视频会议";
+NSBluetoothAlwaysUsageDescription = "云新闻在会议中使用蓝牙连接音频设备";
+NSPhotoLibraryUsageDescription = "云新闻需要访问相册以便在会议聊天中发送图片";
+NSPhotoLibraryAddUsageDescription = "云新闻需要权限以保存会议聊天中的图片";

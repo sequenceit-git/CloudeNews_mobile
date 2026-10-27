@@ -1,0 +1,55 @@
+name: cloud_news_app
+description: "CloudNews - multi-party video meetings powered by Tencent TUIRoomKit."
+publish_to: 'none'
+
+version: 1.0.0+1
+
+environment:
+  sdk: ^3.7.0
+  flutter: ">=3.29.3"
+
+dependencies:
+  flutter:
+    sdk: flutter
+  flutter_localizations:
+    sdk: flutter
+
+  # Local copy of 4.2.0 with a screen-share button added to the bottom bar.
+  tencent_conference_uikit:
+    path: packages/tencent_conference_uikit
+  # 5.0.3+ bundles engine classes that clash with rtc_room_engine on Android.
+  atomic_x_core: 5.0.2
+  tuikit_atomic_x: ^5.1.0
+  # Local copy of TUIKit_Flutter chat/uikit @ e44df10 (not on pub.dev), patched
+  # to drop ExtendSelectionByPageIntent, which Flutter 3.47 removed.
+  tencent_chat_uikit:
+    path: packages/tencent_chat_uikit
+
+  http: ^1.2.2
+  app_links: ^6.3.3
+  provider: ^6.0.5
+
+dependency_overrides:
+  # tencent_chat_uikit needs the atomic-x from the same repo commit.
+  tuikit_atomic_x:
+    git:
+      url: https://github.com/Tencent-RTC/TUIKit_Flutter.git
+      path: atomic-x
+      ref: e44df10df44c46e6a27d0bfdc840869707e70b96
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^5.0.0
+  flutter_launcher_icons: ^0.14.3
+
+flutter:
+  uses-material-design: true
+  assets:
+    - assets/images/
+
+flutter_launcher_icons:
+  android: true
+  ios: true
+  image_path: assets/images/logo.png
+  remove_alpha_ios: true

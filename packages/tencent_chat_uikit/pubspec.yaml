@@ -1,0 +1,50 @@
+name: tencent_chat_uikit
+description: "tencent_chat_uikit is a chat-specific UI library built on top of tuikit_atomic_x."
+version: 1.0.0
+homepage: https://trtc.io
+
+environment:
+  sdk: ^3.6.0
+  flutter: ">=3.3.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+
+  flutter_localizations:
+    sdk: flutter
+  intl: any
+  cupertino_icons: ^1.0.8
+  path_provider: ^2.1.4
+  provider: ^6.0.5
+  cached_network_image: ^3.3.1
+  flutter_svg: ^2.0.10+1
+  url_launcher: ^6.3.1
+  shared_preferences: ^2.5.0
+  http: ^1.2.0
+
+  tuikit_atomic_x: ^5.0.0
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^5.0.0
+
+flutter:
+  uses-material-design: true
+  generate: true
+
+  plugin:
+    platforms:
+      android:
+        package: com.tencent.cloud.tuikit.flutter.tuichatkit
+        pluginClass: TencentChatUikitPlugin
+      ios:
+        pluginClass: TencentChatUikitPlugin
+      ohos:
+        package: com.tencent.cloud.tuikit.flutter.tuichatkit
+        pluginClass: TencentChatUikitPlugin
+
+  assets:
+    - chat_assets/emoji/
+    - chat_assets/icon/

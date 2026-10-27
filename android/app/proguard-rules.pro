@@ -1,0 +1,9 @@
+-keep class com.tencent.** { *; }
+-keep class com.tencent.beacon.** { *; }
+-keep class com.tencent.cloud.iai.lib.** { *; }
+-keep class com.tencent.qimei.** { *; }
+-keep class com.tencent.xmagic.** { *; }
+-keep class com.tcmediax.** { *; }
+-keep class com.google.gson.** { *; }
+-keep class com.trtc.** { *; }
+-keep class io.trtc.** { *; }

@@ -1,0 +1,7 @@
+CFBundleDisplayName = "CloudNews";
+CFBundleName = "CloudNews";
+NSCameraUsageDescription = "CloudNews needs camera access for video meetings";
+NSMicrophoneUsageDescription = "CloudNews needs microphone access for video meetings";
+NSBluetoothAlwaysUsageDescription = "CloudNews uses Bluetooth for audio accessories during meetings";
+NSPhotoLibraryUsageDescription = "CloudNews needs photo library access to send images in meeting chat";
+NSPhotoLibraryAddUsageDescription = "CloudNews needs permission to save images from meeting chat";

@@ -1,0 +1,7 @@
+CFBundleDisplayName = "雲新聞";
+CFBundleName = "雲新聞";
+NSCameraUsageDescription = "雲新聞需要使用相機進行視訊會議";
+NSMicrophoneUsageDescription = "雲新聞需要使用麥克風進行視訊會議";
+NSBluetoothAlwaysUsageDescription = "雲新聞在會議中使用藍牙連接音訊裝置";
+NSPhotoLibraryUsageDescription = "雲新聞需要存取相簿以便在會議聊天中傳送圖片";
+NSPhotoLibraryAddUsageDescription = "雲新聞需要權限以儲存會議聊天中的圖片";

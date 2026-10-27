@@ -1,0 +1,32 @@
+library tencent_chat_uikit;
+
+export 'package:tuikit_atomic_x/atomicx.dart';
+
+export 'src/common/language/index.dart';
+export 'src/ai/ai_media_process_manager.dart';
+export 'src/ai/tts/tts_playback_helper.dart';
+export 'src/ai/tts/voice_item.dart';
+export 'src/ai/tts/voice_message_config.dart';
+export 'src/audio_player/audio_player.dart';
+export 'src/audio_recoder/audio_recorder.dart';
+export 'src/chat_setting/chat_setting.dart';
+export 'src/chat_setting/widgets/chat_background_picker.dart';
+export 'src/chat_setting/widgets/setting_widgets.dart';
+export 'src/common/utils/chat_background_store.dart';
+export 'src/contact_list/contact_list.dart';
+export 'src/conversation_list/conversation_list.dart';
+export 'src/emoji_picker/emoji_manager.dart';
+export 'src/emoji_picker/emoji_picker.dart';
+export 'src/file_picker/file_picker.dart';
+export 'src/image_picker/image_picker.dart';
+export 'src/image_viewer/image_element.dart';
+export 'src/image_viewer/image_viewer_widget.dart';
+export 'src/message_input/message_input.dart';
+export 'src/message_list/message_list.dart';
+export 'src/pages/chat_page.dart';
+export 'src/pages/contacts_page.dart';
+export 'src/pages/conversations_page.dart';
+export 'src/user_picker/user_picker.dart';
+export 'src/video_picker/video_picker.dart';
+export 'src/video_recorder/video_recorder.dart';
+export 'src/widgets/az_ordered_list.dart';

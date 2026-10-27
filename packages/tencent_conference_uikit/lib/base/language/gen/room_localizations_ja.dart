@@ -1,0 +1,808 @@
+// ignore: unused_import
+import 'package:intl/intl.dart' as intl;
+import 'room_localizations.dart';
+
+// ignore_for_file: type=lint
+
+/// The translations for Japanese (`ja`).
+class RoomLocalizationsJa extends RoomLocalizations {
+  RoomLocalizationsJa([String locale = 'ja']) : super(locale);
+
+  @override
+  String get roomkit_input_can_not_empty => '入力は空にできません!';
+
+  @override
+  String get roomkit_create_room => 'ルームを作成';
+
+  @override
+  String get roomkit_enter_room_id => 'ルームIDを入力してください';
+
+  @override
+  String get roomkit_room_type_freedom_speaker => '自由発言ルーム';
+
+  @override
+  String get roomkit_join_room => 'ルームに参加';
+
+  @override
+  String get roomkit_room_type_stage_speaker => 'ステージ発言ルーム';
+
+  @override
+  String get roomkit_room_id => 'ルームID';
+
+  @override
+  String get roomkit_room_type => 'ルームタイプ';
+
+  @override
+  String get roomkit_start_video => 'ビデオを開始';
+
+  @override
+  String get roomkit_stop_video => 'ビデオを停止';
+
+  @override
+  String get roomkit_your_name => 'お名前';
+
+  @override
+  String get roomkit_enable_speaker => 'スピーカーを有効にする';
+
+  @override
+  String get roomkit_enable_audio => 'オーディオを有効にする';
+
+  @override
+  String get roomkit_enable_video => 'ビデオを有効にする';
+
+  @override
+  String get roomkit_mute => 'ミュート';
+
+  @override
+  String get roomkit_unmute => 'ミュート解除';
+
+  @override
+  String get roomkit_end => '終了';
+
+  @override
+  String get roomkit_member_count => 'メンバー(xxx)';
+
+  @override
+  String get roomkit_member => 'メンバー';
+
+  @override
+  String get roomkit_expand => '展開';
+
+  @override
+  String get roomkit_user_room => 'xxxのルーム';
+
+  @override
+  String get roomkit_user_webinar_room => 'xxxのセミナールーム';
+
+  @override
+  String get roomkit_screen_share => '画面共有';
+
+  @override
+  String get roomkit_mute_all_audio => '全員ミュート';
+
+  @override
+  String get roomkit_unmute_all_audio => '全員ミュート解除';
+
+  @override
+  String get roomkit_more => 'もっと見る';
+
+  @override
+  String get roomkit_search_members => 'メンバーを検索';
+
+  @override
+  String get roomkit_invite => '招待';
+
+  @override
+  String get roomkit_role_owner => 'オーナー';
+
+  @override
+  String get roomkit_role_admin => '管理者';
+
+  @override
+  String get roomkit_me => '自分';
+
+  @override
+  String get roomkit_room_link => 'ルームリンク';
+
+  @override
+  String get roomkit_copy => 'コピー';
+
+  @override
+  String get roomkit_copy_room_info => 'ルーム情報をコピー';
+
+  @override
+  String get roomkit_msg_all_members_will_be_muted => 'すべての現在および新規メンバーがミュートされます';
+
+  @override
+  String get roomkit_msg_all_members_video_disabled => 'すべての現在および新規メンバーのビデオが制限されます';
+
+  @override
+  String get roomkit_msg_members_cannot_unmute => 'メンバーはマイクをオンにできなくなります';
+
+  @override
+  String get roomkit_msg_members_cannot_start_video => 'メンバーはビデオをオンにできなくなります';
+
+  @override
+  String get roomkit_confirm => '確認';
+
+  @override
+  String get roomkit_cancel => 'キャンセル';
+
+  @override
+  String get roomkit_disable_all_video => '全員ビデオ禁止';
+
+  @override
+  String get roomkit_enable_all_video => '全員ビデオ許可';
+
+  @override
+  String get roomkit_msg_all_members_will_be_unmuted => 'すべてのメンバーのミュートが解除されます';
+
+  @override
+  String get roomkit_msg_members_can_unmute => 'メンバーはマイクを自由にオンにできます';
+
+  @override
+  String get roomkit_confirm_release => '解除を確認';
+
+  @override
+  String get roomkit_msg_all_members_video_enabled => 'すべてのメンバーのビデオ制限が解除されます';
+
+  @override
+  String get roomkit_msg_members_can_start_video => 'メンバーはビデオを自由にオンにできます';
+
+  @override
+  String get roomkit_toast_all_video_disabled => '全員のビデオをオフにしました。カメラへのアクセスが無効になりました。';
+
+  @override
+  String get roomkit_toast_all_video_enabled => '参加者はビデオを開始できるようになりました。';
+
+  @override
+  String get roomkit_toast_all_audio_disabled => '参加者をミュートしました。マイクへのアクセスが無効になりました。';
+
+  @override
+  String get roomkit_toast_all_audio_enabled => '参加者は自分でミュートを解除できるようになりました。';
+
+  @override
+  String get roomkit_modify_name => '名前を変更';
+
+  @override
+  String get roomkit_request_unmute_audio => 'ミュート解除をリクエスト';
+
+  @override
+  String get roomkit_request_start_video => 'ビデオ開始をリクエスト';
+
+  @override
+  String get roomkit_transfer_owner => 'ホストを譲渡';
+
+  @override
+  String get roomkit_set_admin => '管理者に設定';
+
+  @override
+  String get roomkit_revoke_admin => '管理者を解除';
+
+  @override
+  String get roomkit_mute_text_chat => 'メッセージ禁止';
+
+  @override
+  String get roomkit_unmute_text_chat => 'メッセージ許可';
+
+  @override
+  String get roomkit_remove_member => '削除';
+
+  @override
+  String get roomkit_msg_transfer_owner_to => 'ホストをxxxに譲渡';
+
+  @override
+  String get roomkit_msg_transfer_owner_tip => 'ホストを譲渡すると一般ユーザーになります';
+
+  @override
+  String get roomkit_confirm_transfer => '譲渡を確認';
+
+  @override
+  String get roomkit_toast_you_are_owner => 'あなたはホストになりました';
+
+  @override
+  String get roomkit_toast_owner_transferred => 'ホストがxxxに譲渡されました';
+
+  @override
+  String get roomkit_toast_you_are_admin => 'あなたは管理者になりました';
+
+  @override
+  String get roomkit_toast_admin_set => 'xxxを管理者に設定しました';
+
+  @override
+  String get roomkit_toast_admin_revoked => 'xxxの管理者権限を取り消しました';
+
+  @override
+  String get roomkit_toast_you_are_no_longer_admin => 'あなたの管理者権限が取り消されました';
+
+  @override
+  String get roomkit_toast_room_id_copied => 'ルームIDをコピーしました';
+
+  @override
+  String get roomkit_toast_room_link_copied => 'ルームリンクをコピーしました';
+
+  @override
+  String get roomkit_toast_room_info_copied => 'ルーム情報をコピーしました';
+
+  @override
+  String get roomkit_leave_room => 'ルームを退出';
+
+  @override
+  String get roomkit_end_room => 'ルームを終了';
+
+  @override
+  String get roomkit_toast_room_ended => 'ルームが終了しました';
+
+  @override
+  String get roomkit_confirm_leave_room_by_genera_user => 'ルームを退出してもよろしいですか';
+
+  @override
+  String get roomkit_confirm_leave_room_by_owner => '会議を終了したくない場合は、退出前に新しいホストを指定してください';
+
+  @override
+  String get roomkit_confirm_remove_member => 'xxxをルームから退出させますか？';
+
+  @override
+  String get roomkit_ok => 'OK';
+
+  @override
+  String get roomkit_toast_room_closed => 'ルームが閉じられました。';
+
+  @override
+  String get roomkit_toast_you_were_removed => 'ホストによってルームから退出させられました。';
+
+  @override
+  String get roomkit_toast_audio_invite_sent => '視聴者にオーディオ開始の招待を送信しました';
+
+  @override
+  String get roomkit_toast_video_invite_sent => '視聴者にビデオ開始の招待を送信しました';
+
+  @override
+  String get roomkit_toast_text_chat_disabled => 'テキストチャットが禁止されました';
+
+  @override
+  String get roomkit_toast_text_chat_enabled => 'テキストチャットが許可されました';
+
+  @override
+  String get roomkit_msg_invite_unmute_audio => 'xxxがマイクをオンにするよう招待しています';
+
+  @override
+  String get roomkit_msg_invite_start_video => 'xxxがカメラをオンにするよう招待しています';
+
+  @override
+  String get roomkit_agree => '同意';
+
+  @override
+  String get roomkit_reject => '拒否';
+
+  @override
+  String get roomkit_toast_camera_closed_by_host => 'xxxによってカメラが無効化されました';
+
+  @override
+  String get roomkit_toast_muted_by_host => 'xxxによってマイクが無効化されました';
+
+  @override
+  String get roomkit_enter_nickname => 'ニックネームを入力してください';
+
+  @override
+  String get roomkit_tip_all_muted_cannot_unmute => '全員ミュート中のため、ミュート解除できません';
+
+  @override
+  String get roomkit_tip_all_video_off_cannot_start => '全員ビデオ禁止中のため、カメラをオンにできません';
+
+  @override
+  String get roomkit_room_name => 'ルーム名';
+
+  @override
+  String get roomkit_participant => '参加者(xxx)';
+
+  @override
+  String get roomkit_audience => '観衆(xxx)';
+
+  @override
+  String get roomkit_entered_room => '入室しました';
+
+  @override
+  String get roomkit_switch_to_participant => 'xxxはゲストに設定されました';
+
+  @override
+  String get roomkit_switch_to_audience => 'xxxは視聴者に設定されました';
+
+  @override
+  String get roomkit_switch_to_participant_byself => 'あなたはゲストに設定されました';
+
+  @override
+  String get roomkit_switch_to_audience_byself => 'あなたは視聴者に設定されました';
+
+  @override
+  String get roomkit_set_participant => 'ゲストに設定';
+
+  @override
+  String get roomkit_set_audience => '視聴者に設定';
+
+  @override
+  String get roomkit_transcription_open_subtitle => 'AIリアルタイム字幕をオン';
+
+  @override
+  String get roomkit_transcription_open_minutes => 'AIリアルタイム議事録を表示';
+
+  @override
+  String get roomkit_transcription_close_subtitle => 'AIリアルタイム字幕をオフ';
+
+  @override
+  String get roomkit_transcription_close_minutes => 'AIリアルタイム議事録をオフ';
+
+  @override
+  String get roomkit_transcription_ai_minutes_title => 'AIリアルタイム会議文字起こし';
+
+  @override
+  String get roomkit_transcription_enable_first => 'まずAI字幕を有効にしてください';
+
+  @override
+  String get roomkit_transfer_host_with_asr_warning => 'ルームオーナーを譲渡すると一般メンバーになります。リアルタイム字幕 / AI 議事録は停止し、新しいオーナーが再度有効にする必要があります。';
+
+  @override
+  String get roomkit_transcription_ai_tools => 'AIツール';
+
+  @override
+  String get roomkit_transcription_recording => '記録中...';
+
+  @override
+  String get roomkit_transcription_ai_subtitle_placeholder => 'AIリアルTIME字幕';
+
+  @override
+  String get roomkit_transcription_ai_subtitle_settings => 'AI字幕設定';
+
+  @override
+  String get roomkit_transcription_recognition_and_translation => '識別与翻譯設定';
+
+  @override
+  String get roomkit_transcription_identify_language => '識別語言';
+
+  @override
+  String get roomkit_transcription_owner_only_modify_language => '僅房主可以修改識別語言';
+
+  @override
+  String get roomkit_transcription_owner_changed_source_language => '房主已更改字幕识别语言类型';
+
+  @override
+  String get roomkit_transcription_translate_language => '翻譯語言';
+
+  @override
+  String get roomkit_transcription_bilingual_subtitle => '字幕に二言語を表示';
+
+  @override
+  String get roomkit_transcription_select_recognition_language => '認識言語を選択してください';
+
+  @override
+  String get roomkit_transcription_auto_detect_chinese_english => '自動認識（中国語/英語）';
+
+  @override
+  String get roomkit_transcription_speaking_chinese => '中国語を話す';
+
+  @override
+  String get roomkit_transcription_speaking_english => '英語を話す';
+
+  @override
+  String get roomkit_transcription_speaking_cantonese => '広東語を話す';
+
+  @override
+  String get roomkit_transcription_speaking_vietnamese => 'ベトナム語を話す';
+
+  @override
+  String get roomkit_transcription_speaking_japanese => '日本語を話す';
+
+  @override
+  String get roomkit_transcription_speaking_korean => '韓国語を話す';
+
+  @override
+  String get roomkit_transcription_speaking_indonesian => 'インドネシア語を話す';
+
+  @override
+  String get roomkit_transcription_speaking_thai => 'タイ語を話す';
+
+  @override
+  String get roomkit_transcription_speaking_portuguese => 'ポルトガル語を話す';
+
+  @override
+  String get roomkit_transcription_speaking_turkish => 'トルコ語を話す';
+
+  @override
+  String get roomkit_transcription_speaking_arabic => 'アラビア語を話す';
+
+  @override
+  String get roomkit_transcription_speaking_spanish => 'スペイン語を話す';
+
+  @override
+  String get roomkit_transcription_speaking_hindi => 'ヒンディー語を話す';
+
+  @override
+  String get roomkit_transcription_speaking_french => 'フランス語を話す';
+
+  @override
+  String get roomkit_transcription_speaking_malay => 'マレー語を話す';
+
+  @override
+  String get roomkit_transcription_speaking_filipino => 'フィリピン語を話す';
+
+  @override
+  String get roomkit_transcription_speaking_german => 'ドイツ語を話す';
+
+  @override
+  String get roomkit_transcription_speaking_italian => 'イタリア語を話す';
+
+  @override
+  String get roomkit_transcription_speaking_russian => 'ロシア語を話す';
+
+  @override
+  String get roomkit_transcription_select_translation_language => '翻訳言語を選択してください';
+
+  @override
+  String get roomkit_transcription_no_translation => '翻訳なし';
+
+  @override
+  String get roomkit_transcription_language_chinese => '简体中文（中国語）';
+
+  @override
+  String get roomkit_transcription_language_english => 'English（英語）';
+
+  @override
+  String get roomkit_transcription_language_vietnamese => 'Tiếng Việt（ベトナム語）';
+
+  @override
+  String get roomkit_transcription_language_japanese => '日本語';
+
+  @override
+  String get roomkit_transcription_language_korean => '한국어（韓国語）';
+
+  @override
+  String get roomkit_transcription_language_indonesian => 'Bahasa Indonesia（インドネシア語）';
+
+  @override
+  String get roomkit_transcription_language_thai => 'ภาษาไทย（タイ語）';
+
+  @override
+  String get roomkit_transcription_language_portuguese => 'Português（ポルトガル語）';
+
+  @override
+  String get roomkit_transcription_language_arabic => 'العربية（アラビア語）';
+
+  @override
+  String get roomkit_transcription_language_spanish => 'Español（スペイン語）';
+
+  @override
+  String get roomkit_transcription_language_french => 'Français（フランス語）';
+
+  @override
+  String get roomkit_transcription_language_malay => 'Bahasa Melayu（マレー語）';
+
+  @override
+  String get roomkit_transcription_language_german => 'Deutsch（ドイツ語）';
+
+  @override
+  String get roomkit_transcription_language_italian => 'Italiano（イタリア語）';
+
+  @override
+  String get roomkit_transcription_language_russian => 'Русский（ロシア語）';
+
+  @override
+  String get roomkit_screen_sharing_tip => '画面を共有しています';
+
+  @override
+  String get roomkit_room_type_meeting => '会議ルーム';
+
+  @override
+  String get roomkit_room_type_webinar => 'ウェビナールーム';
+
+  @override
+  String get roomkit_start_screen_share => '画面共有';
+
+  @override
+  String get roomkit_stop_screen_share => '共有を停止';
+
+  @override
+  String get roomkit_btn_stop => '停止';
+
+  @override
+  String get roomkit_video_share_occupied => 'メインスピーカー席は既に占有されています。カメラを有効にできません。';
+
+  @override
+  String get roomkit_screen_share_occupied => 'メインスピーカー席は既に占有されています。画面共有を開始できません。';
+
+  @override
+  String get roomkit_camera_blocked_by_screen_share => '現在画面共有中のため、ビデオをオンにできません。先に画面共有を停止してください';
+
+  @override
+  String get roomkit_screen_share_blocked_by_camera => '現在ビデオ配信中のため、画面共有を開始できません。先にビデオをオフにしてください';
+
+  @override
+  String get roomkit_screen_share_start_message => '現在誰かがプレゼンテーションを行っています。画面共有を開始するとプレゼンテーションが中断されます。続行しますか？';
+
+  @override
+  String get roomkit_video_start_message => '現在誰かがプレゼンテーションを行っています。ビデオをオンにするとプレゼンテーションが中断されます。続行しますか？';
+
+  @override
+  String get roomkit_toast_screen_share_closed_by_host => 'xxxによって画面共有が停止されました';
+
+  @override
+  String get roomkit_screen_sharing_status => '画面共有中';
+
+  @override
+  String get roomkit_hands_up => '挙手';
+
+  @override
+  String get roomkit_hands_down => '手を下ろす';
+
+  @override
+  String get roomkit_hands_up_list => '挙手リスト';
+
+  @override
+  String get roomkit_hands_up_empty => '挙手リクエストはありません';
+
+  @override
+  String get roomkit_toast_raise_hand_rejected => '挙手リクエストが拒否されました';
+
+  @override
+  String get roomkit_err_0_success => '操作が成功しました';
+
+  @override
+  String get roomkit_err_general => '未分類の一般エラー';
+
+  @override
+  String get roomkit_err_n2_request_rate_limited => 'リクエストが制限されています。後でもう一度お試しください';
+
+  @override
+  String get roomkit_err_7008_request_rate_limited => 'リクエストが制限されています。後でもう一度お試しください';
+
+  @override
+  String get roomkit_err_10017_muted_in_room => '現在のルームでミュートされています';
+
+  @override
+  String get roomkit_err_7015_sensitive_words => '不適切な言葉が検出されました。修正してもう一度お試しください';
+
+  @override
+  String get roomkit_err_9522_content_too_long => '内容が長すぎます。内容を短くしてもう一度お試しください';
+
+  @override
+  String get roomkit_err_network_error => 'ネットワークエラーです。後でもう一度お試しください';
+
+  @override
+  String get roomkit_err_n3_repeat_operation => '重複操作';
+
+  @override
+  String get roomkit_err_n4_roomID_not_match => 'ルームIDが一致しません。退出または切り替えを確認してください。';
+
+  @override
+  String get roomkit_err_n1000_sdk_appid_not_found => 'SDKAppIDが見つかりません。TRTCコンソールでアプリ情報を確認してください';
+
+  @override
+  String get roomkit_err_n1001_invalid_parameter => 'APIを呼び出す際のパラメータが不正です。パラメータを確認してください';
+
+  @override
+  String get roomkit_err_n1002_not_logged_in => 'ログインしていません。ログインAPIを呼び出してください';
+
+  @override
+  String get roomkit_err_n1003_permission_denied => '権限の取得に失敗しました。デバイスの権限が有効か確認してください';
+
+  @override
+  String get roomkit_err_n1004_package_required => 'この機能には追加パッケージが必要です。TRTCコンソールで必要なパッケージを有効にしてください';
+
+  @override
+  String get roomkit_err_n1005_invalid_license => 'ライセンスが無効または期限切れです。TRTCコンソールで有効期限を確認してください。';
+
+  @override
+  String get roomkit_err_n1100_camera_open_failed => 'システムの問題でカメラを開けませんでした。カメラデバイスを確認してください';
+
+  @override
+  String get roomkit_err_n1101_camera_no_permission => 'カメラにシステム権限がありません。システム権限を確認してください';
+
+  @override
+  String get roomkit_err_n1102_camera_occupied => 'カメラが使用中です。他のプロセスがカメラを使用していないか確認してください';
+
+  @override
+  String get roomkit_err_n1103_camera_not_found => 'カメラデバイスがありません。カメラデバイスを接続してください';
+
+  @override
+  String get roomkit_err_n1104_mic_open_failed => 'システムの問題でマイクを開けませんでした。マイクデバイスを確認してください';
+
+  @override
+  String get roomkit_err_n1105_mic_no_permission => 'マイクにシステム権限がありません。システム権限を確認してください';
+
+  @override
+  String get roomkit_err_n1106_mic_occupied => 'マイクが使用中です';
+
+  @override
+  String get roomkit_err_n1107_mic_not_found => 'マイクデバイスがありません';
+
+  @override
+  String get roomkit_err_n1108_screen_share_get_source_failed => '画面共有ソースの取得に失敗しました。画面録画の権限を確認してください';
+
+  @override
+  String get roomkit_err_n1109_screen_share_start_failed => '画面共有の開始に失敗しました。他の人が画面共有中か確認してください';
+
+  @override
+  String get roomkit_err_n2101_not_in_room => 'この機能はルームに入室後のみ使用できます';
+
+  @override
+  String get roomkit_err_n2102_owner_cannot_leave => 'オーナーは退出できません。ルームを閉じることのみ可能です';
+
+  @override
+  String get roomkit_err_n2103_unsupported_in_room_type => '現在のルームタイプではこの操作はサポートされていません';
+
+  @override
+  String get roomkit_err_n2105_invalid_room_id => 'ルームIDが不正です。印刷可能なASCII文字（0x20-0x7e）で最大48バイトである必要があります';
+
+  @override
+  String get roomkit_err_n2107_invalid_room_name => 'ルーム名が不正です。最大30バイトで、UTF-8エンコーディングである必要があります';
+
+  @override
+  String get roomkit_err_n2108_user_already_in_other_room => 'ユーザーは既に別のルームにいます。別のルームに入るには、まず退出するか新しいインスタンスを使用してください';
+
+  @override
+  String get roomkit_err_n2200_user_not_exist => 'ユーザーが存在しません';
+
+  @override
+  String get roomkit_err_n2300_need_owner_permission => 'この操作にはオーナー権限が必要です';
+
+  @override
+  String get roomkit_err_n2301_need_admin_permission => 'この操作にはオーナーまたは管理者権限が必要です';
+
+  @override
+  String get roomkit_err_n2310_signal_no_permission => 'シグナリングリクエストの権限がありません。例：自分が開始していない招待のキャンセル';
+
+  @override
+  String get roomkit_err_n2311_signal_invalid_request_id => 'シグナリングリクエストIDが無効または既に処理済みです';
+
+  @override
+  String get roomkit_err_n2312_signal_request_duplicated => 'シグナリングリクエストが重複しています';
+
+  @override
+  String get roomkit_err_n2340_seat_count_limit_exceeded => '最大席数がパッケージ数量制限を超えています';
+
+  @override
+  String get roomkit_err_n2344_seat_not_exist => '席番号が存在しません';
+
+  @override
+  String get roomkit_err_n2360_seat_audio_locked => '現在の席のオーディオがロックされています';
+
+  @override
+  String get roomkit_err_n2361_mic_need_request_permission => 'マイクを開くにはオーナーまたは管理者に申請が必要です';
+
+  @override
+  String get roomkit_err_n2370_seat_video_locked => '現在の席のビデオがロックされています。カメラを開くにはオーナーによる解除が必要です';
+
+  @override
+  String get roomkit_err_n2371_camera_need_request_permission => 'カメラを開くにはオーナーまたは管理者に申請が必要です';
+
+  @override
+  String get roomkit_err_n2372_screen_share_seat_locked => '現在の席のビデオがロックされています。画面共有を開くにはオーナーによる解除が必要です';
+
+  @override
+  String get roomkit_err_n2373_screen_share_need_permission => '画面共有を開くにはオーナーまたは管理者に申請が必要です';
+
+  @override
+  String get roomkit_err_n2380_all_members_muted => '現在のルームで全員ミュートが有効です';
+
+  @override
+  String get roomkit_err_n4001_room_not_support_preload => '現在のルームはプリロードをサポートしていません';
+
+  @override
+  String get roomkit_err_n6001_device_busy_during_call => '通話中のため、デバイス操作に失敗しました';
+
+  @override
+  String get roomkit_err_100001_server_internal_error => 'サーバー内部エラーです。再試行してください';
+
+  @override
+  String get roomkit_err_100002_server_invalid_parameter => 'パラメータが不正です。エラーの説明に従ってリクエストを確認してください';
+
+  @override
+  String get roomkit_err_100003_room_id_already_exists => 'ルームIDは既に使用されています。別のルームIDを選択してください';
+
+  @override
+  String get roomkit_err_100004_room_not_exist => 'ルームが存在しないか、既に解散されています';
+
+  @override
+  String get roomkit_err_100005_not_room_member => 'ルームメンバーではありません';
+
+  @override
+  String get roomkit_err_100006_operation_not_allowed => 'この操作を実行できません（権限がないか、シナリオ制限のため）';
+
+  @override
+  String get roomkit_err_100007_no_payment_info => '支払い情報がありません。コンソールでパッケージを購入してください';
+
+  @override
+  String get roomkit_err_100008_room_is_full => 'ルームが満員です';
+
+  @override
+  String get roomkit_err_100009_room_tag_limit_exceeded => 'タグ数が上限を超えています';
+
+  @override
+  String get roomkit_err_100010_room_id_reusable_by_owner => 'ルームIDは既に使用されており、操作者がオーナーの場合は直接使用できます';
+
+  @override
+  String get roomkit_err_100011_room_id_occupied_by_im => 'ルームIDはIMに使用されています。別のルームIDを使用するか、グループを解散してください';
+
+  @override
+  String get roomkit_err_100012_create_room_frequency_limit => 'ルーム作成の頻度制限を超えています。同じルームIDは1秒に1回のみ作成可能です';
+
+  @override
+  String get roomkit_err_100013_payment_limit_exceeded => '支払い上限を超えています。例：席数、PKマッチルーム数などが支払い制限を超えています';
+
+  @override
+  String get roomkit_err_100015_invalid_room_type => '無効なルームタイプ';
+
+  @override
+  String get roomkit_err_100016_member_already_banned => 'このメンバーは既にBANされています';
+
+  @override
+  String get roomkit_err_100017_member_already_muted => 'このメンバーは既にミュートされています';
+
+  @override
+  String get roomkit_err_100018_room_password_required => 'このルームに入るにはパスワードが必要です';
+
+  @override
+  String get roomkit_err_100019_room_password_incorrect => 'ルーム入室パスワードが間違っています';
+
+  @override
+  String get roomkit_err_100020_admin_limit_exceeded => '管理者の人数が上限に達しました';
+
+  @override
+  String get roomkit_err_100102_signal_request_conflict => 'シグナリングリクエストの競合';
+
+  @override
+  String get roomkit_err_100200_seat_is_locked => '席がロックされています。別の席をお試しください';
+
+  @override
+  String get roomkit_err_100201_seat_is_occupied => '現在の席は既に使用されています';
+
+  @override
+  String get roomkit_err_100202_already_in_seat_queue => '既に席待ちキューにいます';
+
+  @override
+  String get roomkit_err_100203_already_on_seat => '既に席についています';
+
+  @override
+  String get roomkit_err_100204_not_in_seat_queue => '席待ちキューにいません';
+
+  @override
+  String get roomkit_err_100205_all_seats_are_full => 'ゲストの人数が上限に達しました。';
+
+  @override
+  String get roomkit_err_100206_not_on_seat => 'まずゲストになってください';
+
+  @override
+  String get roomkit_err_100210_user_already_on_seat => 'ユーザーは既に席についています';
+
+  @override
+  String get roomkit_err_100211_seat_not_supported => 'このルームは席機能をサポートしていません';
+
+  @override
+  String get roomkit_err_100251_seat_list_is_empty => '席リストが空です';
+
+  @override
+  String get roomkit_err_100253_speaker_seat_occupied => 'メインスピーカー席は既に占有されています。デバイスを有効にできません';
+
+  @override
+  String get roomkit_err_100500_room_metadata_key_limit => 'ルームメタデータのキー数が上限を超えています';
+
+  @override
+  String get roomkit_err_100501_room_metadata_value_limit => 'ルームメタデータの値サイズが最大バイト制限を超えています';
+
+  @override
+  String get roomkit_err_100502_room_metadata_total_limit => 'ルームメタデータの全値の合計サイズが最大バイト制限を超えています';
+
+  @override
+  String get roomkit_err_100503_room_metadata_no_valid_keys => 'メタデータ削除時に有効なキーがありません';
+
+  @override
+  String get roomkit_err_100504_room_metadata_key_size_limit => 'ルームメタデータのキーサイズが最大バイト制限を超えています';
+
+  @override
+  String get roomkit_err_7002_invalid_user_id => '無効なユーザーID';
+
+  @override
+  String get roomkit_room_running => '実行中';
+
+  @override
+  String get roomkit_chat => 'チャット';
+}

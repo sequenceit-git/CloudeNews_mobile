@@ -1,0 +1,74 @@
+## Third-party Licenses
+
+This project contains modified versions of:
+
+### 1. azlistview
+Original: https://github.com/flutterchina/azlistview
+Copyright (c) 2020 Flutter中文网
+License: BSD 3-Clause License
+
+### 2. extended_text
+Original: https://github.com/fluttercandies/extended_text
+Copyright (c) 2019 zmtzawqlp
+License: MIT
+
+### 3. extended_text_field
+Original: https://github.com/fluttercandies/extended_text_field
+Copyright (c) 2019 zmtzawqlp
+License: MIT
+
+### 4. extended_text_library
+Original: https://github.com/fluttercandies/extended_text_library
+Copyright (c) 2019 zmtzawqlp
+License: MIT
+
+### 5. flutter_swipe_action_cell
+Original: https://github.com/luckysmg/flutter_swipe_action_cell
+Copyright (c) 2004 luckysmg
+License: Apache-2.0 license
+
+### 6. lpinyin
+Original: https://github.com/flutterchina/lpinyin
+Copyright (c) 2018 Sky24n
+License: BSD 2-Clause License
+
+### 7. scroll_to_index
+Original: https://github.com/quire-io/scroll-to-index
+Copyright (c) 2019 Quire
+License: MIT
+
+### 8. scrollable_positioned_list
+Original: https://github.com/google/flutter.widgets/tree/master/packages/scrollable_positioned_list
+Copyright (c) 2018 Google
+License: BSD-3-Clause
+
+### 9. visibility_detector
+Original: https://github.com/google/flutter.widgets/tree/master/packages/visibility_detector
+Copyright (c) 2018 Google
+License: BSD-3-Clause
+
+---
+
+## MIT License Text
+
+MIT License
+
+Copyright (c) 2025 Tencent
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
