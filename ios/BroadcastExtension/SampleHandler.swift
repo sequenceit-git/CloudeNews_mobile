@@ -1,10 +1,9 @@
 import ReplayKit
 import TXLiteAVSDK_ReplayKitExt
 
-/// Empty skips the App Group. The main app passes the same empty value to
-/// DeviceStore.startScreenShare(iOSAppGroup:). Sharing can start, with less
-/// stable cross-process delivery than a configured App Group.
-let APPGROUP = ""
+/// Must match the App Group on both the Runner target and this extension,
+/// and the string passed to DeviceStore.startScreenShare(iOSAppGroup:).
+let APPGROUP = "group.com.cloudnews.app"
 
 class SampleHandler: RPBroadcastSampleHandler, TXReplayKitExtDelegate {
   override func broadcastStarted(withSetupInfo setupInfo: [String: NSObject]?) {

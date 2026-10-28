@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:tuikit_atomic_x/atomicx.dart';
 import 'package:flutter/material.dart' hide AlertDialog;
 import 'package:tencent_conference_uikit/base/index.dart';
@@ -224,7 +226,7 @@ class _RoomBottomBarWidgetState extends State<RoomBottomBarWidget> {
       return;
     }
     deviceStore.startScreenShare(
-      iOSAppGroup: '',
+      iOSAppGroup: Platform.isIOS ? 'group.com.cloudnews.app' : '',
     );
     final pickerShown = await TencentConferenceUikitPlatform.instance.showScreenSharePicker();
     if (!pickerShown) {
