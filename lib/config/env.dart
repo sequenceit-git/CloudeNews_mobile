@@ -5,13 +5,13 @@ class Env {
 
   static const String apiBaseUrl = String.fromEnvironment(
     'API_BASE_URL',
-    defaultValue: 'https://cloudmeet.sequenceit.software/api/v1',
+    defaultValue: 'https://admin.cloudnewsmeet.com/api/v1',
   );
 
   /// Public web origin used in invite links.
   static const String webOrigin = String.fromEnvironment(
     'WEB_ORIGIN',
-    defaultValue: 'https://cloudmeet.sequenceit.software',
+    defaultValue: 'https://admin.cloudnewsmeet.com',
   );
 
   /// Fallback only; the server returns the SDKAppID with every UserSig.

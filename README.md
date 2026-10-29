@@ -59,7 +59,7 @@ Screen share is Android-only for now. iPhone screen share needs a Broadcast Uplo
 
 ## Server
 
-The default API is `https://cloudmeet.sequenceit.software/api/v1`. Override it at build time:
+The default API is `https://admin.cloudnewsmeet.com/api/v1`. Override it at build time:
 
 ```bash
 flutter run --dart-define=API_BASE_URL=http://192.168.x.x:4000/api/v1
