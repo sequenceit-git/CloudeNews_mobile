@@ -3,7 +3,7 @@ import TXLiteAVSDK_ReplayKitExt
 
 /// Must match the App Group on both the Runner target and this extension,
 /// and the string passed to DeviceStore.startScreenShare(iOSAppGroup:).
-let APPGROUP = "group.com.cloudnews.app"
+let APPGROUP = "group.com.cloudnews.app.ios"
 
 class SampleHandler: RPBroadcastSampleHandler, TXReplayKitExtDelegate {
   override func broadcastStarted(withSetupInfo setupInfo: [String: NSObject]?) {

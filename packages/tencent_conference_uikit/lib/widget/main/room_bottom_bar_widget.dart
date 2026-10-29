@@ -226,7 +226,7 @@ class _RoomBottomBarWidgetState extends State<RoomBottomBarWidget> {
       return;
     }
     deviceStore.startScreenShare(
-      iOSAppGroup: Platform.isIOS ? 'group.com.cloudnews.app' : '',
+      iOSAppGroup: Platform.isIOS ? 'group.com.cloudnews.app.ios' : '',
     );
     final pickerShown = await TencentConferenceUikitPlatform.instance.showScreenSharePicker();
     if (!pickerShown) {
