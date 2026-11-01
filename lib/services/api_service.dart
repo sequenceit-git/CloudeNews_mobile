@@ -141,4 +141,41 @@ class ApiService {
     }
     return data;
   }
+
+  Future<Map<String, dynamic>> uploadMeetingFile({
+    required String meetingCode,
+    required String userId,
+    required String displayName,
+    required String filePath,
+    required String fileName,
+  }) async {
+    final uri = Uri.parse('${Env.apiBaseUrl}/meetings/${Uri.encodeComponent(meetingCode)}/files');
+    final request = http.MultipartRequest('POST', uri)
+      ..fields['userId'] = userId
+      ..fields['displayName'] = displayName
+      ..files.add(await http.MultipartFile.fromPath('file', filePath, filename: fileName));
+    final streamed = await request.send().timeout(const Duration(seconds: 60));
+    final res = await http.Response.fromStream(streamed);
+    Map<String, dynamic> data = const {};
+    if (res.body.isNotEmpty) {
+      final decoded = jsonDecode(res.body);
+      if (decoded is Map) data = Map<String, dynamic>.from(decoded);
+    }
+    if (res.statusCode < 200 || res.statusCode >= 300) {
+      final message = data['error'];
+      throw ApiException(message is String && message.isNotEmpty ? message : 'Upload failed',
+          statusCode: res.statusCode);
+    }
+    return data;
+  }
+
+  Uri meetingChatUri(String meetingCode) {
+    final httpUri = Uri.parse('${Env.apiBaseUrl}/meetings/${Uri.encodeComponent(meetingCode)}/chat');
+    return httpUri.replace(scheme: httpUri.scheme == 'https' ? 'wss' : 'ws');
+  }
+
+  String absoluteApiUrl(String path) {
+    if (path.startsWith('http')) return path;
+    return '${Env.webOrigin}$path';
+  }
 }

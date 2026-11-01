@@ -68,8 +68,8 @@ class TrtcCredentials {
     this.displayName,
   });
 
-  /// The server sends a numeric `roomId` plus its string form `strRoomId`;
-  /// TUIRoomKit takes string room IDs, and every client must use the same one.
+  /// The server sends a numeric `roomId` and the same digits as `strRoomId`.
+  /// `enterRoom` uses only the numeric id. Do not send both to TRTC.
   factory TrtcCredentials.fromJson(Map<String, dynamic> json, {required String meetingCode}) {
     final strRoomId = json['strRoomId']?.toString() ?? '';
     final numericRoomId = json['roomId']?.toString() ?? '';

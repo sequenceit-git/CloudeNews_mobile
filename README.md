@@ -1,15 +1,16 @@
 # CloudNews
 
-Android and iOS meeting app built from scratch with the official Tencent TUIRoomKit Flutter package (`tencent_conference_uikit` 4.2.0). The meeting room itself is Tencent's ready-made `RoomMainWidget`. UserSigs stay on the existing CloudNews server.
+Android and iOS meeting app. The meeting room uses the Tencent TRTC Flutter engine (`tencent_rtc_sdk`), not TUIRoomKit. UserSigs stay on the CloudNews server. Meeting chat, images, and files stay on that server too.
 
 ## What it uses
 
 | Piece | Source |
 |---|---|
-| Meeting room UI | Official [TUIRoomKit Flutter Integration Guide](https://trtc.io/document/57508) |
-| Login / create / join | `LoginStore.shared.login` then `RoomMainWidget` with `RoomBehavior.create` or `RoomBehavior.enter` |
+| Meeting room | `TRTCCloud.enterRoom` and `TRTCCloudVideoView` |
+| Login / create / join | CloudNews API, then the plain TRTC room |
 | UserSig | CloudNews server (`POST /meetings/instant` for the host, `POST /meetings/:code/join` for a guest) |
-| App screens | Welcome, Host login, Host dashboard, Pre-join lobby |
+| Chat | CloudNews WebSocket and file upload |
+| App screens | Welcome, Host login, Host dashboard, Pre-join lobby, Meeting room |
 
 There is no React Native meeting UIKit. That is why this app is Flutter, not React Native.
 

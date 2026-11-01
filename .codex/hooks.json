@@ -1,0 +1,54 @@
+{
+  "hooks": {
+    "UserPromptSubmit": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "'/Users/ovijit/.nvm/versions/node/v24.11.1/bin/node' '/Volumes/Extended/Projects/CloudeNews_mobile/.codex/skills/trtc/runtime/telemetry.cjs' hook --ide 'codex' --cwd '/Volumes/Extended/Projects/CloudeNews_mobile' --state-root '/Users/ovijit/Library/Application Support/tencent-rtc-skill'",
+            "commandWindows": "\"/Users/ovijit/.nvm/versions/node/v24.11.1/bin/node\" \"/Volumes/Extended/Projects/CloudeNews_mobile/.codex/skills/trtc/runtime/telemetry.cjs\" hook --ide \"codex\" --cwd \"/Volumes/Extended/Projects/CloudeNews_mobile\" --state-root \"/Users/ovijit/Library/Application Support/tencent-rtc-skill\""
+          }
+        ]
+      }
+    ],
+    "PreToolUse": [
+      {
+        "matcher": "Read",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "[ ! -f \"/Volumes/Extended/Projects/CloudeNews_mobile/.codex/skills/trtc/hooks/gate_slice_read.py\" ] || python3 \"/Volumes/Extended/Projects/CloudeNews_mobile/.codex/skills/trtc/hooks/gate_slice_read.py\""
+          }
+        ]
+      },
+      {
+        "matcher": "Write|Edit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "[ ! -f \"/Volumes/Extended/Projects/CloudeNews_mobile/.codex/skills/trtc/hooks/topic_phase_gate.py\" ] || python3 \"/Volumes/Extended/Projects/CloudeNews_mobile/.codex/skills/trtc/hooks/topic_phase_gate.py\""
+          },
+          {
+            "type": "command",
+            "command": "[ ! -f \"/Volumes/Extended/Projects/CloudeNews_mobile/.codex/skills/trtc/hooks/gate_slice_write.py\" ] || python3 \"/Volumes/Extended/Projects/CloudeNews_mobile/.codex/skills/trtc/hooks/gate_slice_write.py\""
+          },
+          {
+            "type": "command",
+            "command": "[ ! -f \"/Volumes/Extended/Projects/CloudeNews_mobile/.codex/skills/trtc-conference/hooks/pretooluse_require_business_decisions.py\" ] || python3 \"/Volumes/Extended/Projects/CloudeNews_mobile/.codex/skills/trtc-conference/hooks/pretooluse_require_business_decisions.py\""
+          }
+        ]
+      }
+    ],
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "'/Users/ovijit/.nvm/versions/node/v24.11.1/bin/node' '/Volumes/Extended/Projects/CloudeNews_mobile/.codex/skills/trtc/runtime/stop-hook-dispatcher.cjs' --ide 'codex' --runtime-path '/Volumes/Extended/Projects/CloudeNews_mobile/.codex/skills/trtc/runtime/telemetry.cjs' --cwd '/Volumes/Extended/Projects/CloudeNews_mobile' --state-root '/Users/ovijit/Library/Application Support/tencent-rtc-skill' --guard-path '/Volumes/Extended/Projects/CloudeNews_mobile/.codex/skills/trtc/hooks/stop_require_apply_evidence.py'",
+            "commandWindows": "\"/Users/ovijit/.nvm/versions/node/v24.11.1/bin/node\" \"/Volumes/Extended/Projects/CloudeNews_mobile/.codex/skills/trtc/runtime/stop-hook-dispatcher.cjs\" --ide \"codex\" --runtime-path \"/Volumes/Extended/Projects/CloudeNews_mobile/.codex/skills/trtc/runtime/telemetry.cjs\" --cwd \"/Volumes/Extended/Projects/CloudeNews_mobile\" --state-root \"/Users/ovijit/Library/Application Support/tencent-rtc-skill\" --guard-path \"/Volumes/Extended/Projects/CloudeNews_mobile/.codex/skills/trtc/hooks/stop_require_apply_evidence.py\""
+          }
+        ]
+      }
+    ]
+  }
+}

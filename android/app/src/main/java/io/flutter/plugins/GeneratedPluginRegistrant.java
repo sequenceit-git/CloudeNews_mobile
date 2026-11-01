@@ -21,39 +21,24 @@ public final class GeneratedPluginRegistrant {
       Log.e(TAG, "Error registering plugin app_links, com.llfbandit.app_links.AppLinksPlugin", e);
     }
     try {
-      flutterEngine.getPlugins().add(new io.trtc.tuikit.atomicxcore.AtomicXCorePlugin());
+      flutterEngine.getPlugins().add(new com.mr.flutter.plugin.filepicker.FilePickerPlugin());
     } catch (Exception e) {
-      Log.e(TAG, "Error registering plugin atomic_x_core, io.trtc.tuikit.atomicxcore.AtomicXCorePlugin", e);
+      Log.e(TAG, "Error registering plugin file_picker, com.mr.flutter.plugin.filepicker.FilePickerPlugin", e);
     }
     try {
-      flutterEngine.getPlugins().add(new com.github.dart_lang.jni.JniPlugin());
+      flutterEngine.getPlugins().add(new io.flutter.plugins.flutter_plugin_android_lifecycle.FlutterAndroidLifecyclePlugin());
     } catch (Exception e) {
-      Log.e(TAG, "Error registering plugin jni, com.github.dart_lang.jni.JniPlugin", e);
+      Log.e(TAG, "Error registering plugin flutter_plugin_android_lifecycle, io.flutter.plugins.flutter_plugin_android_lifecycle.FlutterAndroidLifecyclePlugin", e);
     }
     try {
-      flutterEngine.getPlugins().add(new com.github.dart_lang.jni_flutter.JniFlutterPlugin());
+      flutterEngine.getPlugins().add(new io.flutter.plugins.imagepicker.ImagePickerPlugin());
     } catch (Exception e) {
-      Log.e(TAG, "Error registering plugin jni_flutter, com.github.dart_lang.jni_flutter.JniFlutterPlugin", e);
+      Log.e(TAG, "Error registering plugin image_picker_android, io.flutter.plugins.imagepicker.ImagePickerPlugin", e);
     }
     try {
-      flutterEngine.getPlugins().add(new com.tencent.cloud.tuikit.flutter.barrage.BarragePlugin());
+      flutterEngine.getPlugins().add(new com.baseflow.permissionhandler.PermissionHandlerPlugin());
     } catch (Exception e) {
-      Log.e(TAG, "Error registering plugin live_uikit_barrage, com.tencent.cloud.tuikit.flutter.barrage.BarragePlugin", e);
-    }
-    try {
-      flutterEngine.getPlugins().add(new com.rtc.room.engine.RtcRoomEngine());
-    } catch (Exception e) {
-      Log.e(TAG, "Error registering plugin rtc_room_engine_impl, com.rtc.room.engine.RtcRoomEngine", e);
-    }
-    try {
-      flutterEngine.getPlugins().add(new io.flutter.plugins.sharedpreferences.SharedPreferencesPlugin());
-    } catch (Exception e) {
-      Log.e(TAG, "Error registering plugin shared_preferences_android, io.flutter.plugins.sharedpreferences.SharedPreferencesPlugin", e);
-    }
-    try {
-      flutterEngine.getPlugins().add(new com.tekartik.sqflite.SqflitePlugin());
-    } catch (Exception e) {
-      Log.e(TAG, "Error registering plugin sqflite_android, com.tekartik.sqflite.SqflitePlugin", e);
+      Log.e(TAG, "Error registering plugin permission_handler_android, com.baseflow.permissionhandler.PermissionHandlerPlugin", e);
     }
     try {
       flutterEngine.getPlugins().add(new com.tencent.vod.flutter.SuperPlayerPlugin());
@@ -61,29 +46,9 @@ public final class GeneratedPluginRegistrant {
       Log.e(TAG, "Error registering plugin super_player, com.tencent.vod.flutter.SuperPlayerPlugin", e);
     }
     try {
-      flutterEngine.getPlugins().add(new com.tencent.cloud.tuikit.flutter.tuichatkit.TencentChatUikitPlugin());
-    } catch (Exception e) {
-      Log.e(TAG, "Error registering plugin tencent_chat_uikit, com.tencent.cloud.tuikit.flutter.tuichatkit.TencentChatUikitPlugin", e);
-    }
-    try {
-      flutterEngine.getPlugins().add(new com.tencent.chat.tencent_cloud_chat_sdk.TencentCloudChatSdkPlugin());
-    } catch (Exception e) {
-      Log.e(TAG, "Error registering plugin tencent_cloud_chat_sdk, com.tencent.chat.tencent_cloud_chat_sdk.TencentCloudChatSdkPlugin", e);
-    }
-    try {
-      flutterEngine.getPlugins().add(new com.example.tencent_conference_uikit.TencentConferenceUikitPlugin());
-    } catch (Exception e) {
-      Log.e(TAG, "Error registering plugin tencent_conference_uikit, com.example.tencent_conference_uikit.TencentConferenceUikitPlugin", e);
-    }
-    try {
       flutterEngine.getPlugins().add(new com.tencent.trtcplugin.TRTCPlugin());
     } catch (Exception e) {
       Log.e(TAG, "Error registering plugin tencent_rtc_sdk, com.tencent.trtcplugin.TRTCPlugin", e);
-    }
-    try {
-      flutterEngine.getPlugins().add(new io.trtc.tuikit.atomicx.AtomicXPlugin());
-    } catch (Exception e) {
-      Log.e(TAG, "Error registering plugin tuikit_atomic_x, io.trtc.tuikit.atomicx.AtomicXPlugin", e);
     }
     try {
       flutterEngine.getPlugins().add(new io.flutter.plugins.urllauncher.UrlLauncherPlugin());

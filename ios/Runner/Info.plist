@@ -51,6 +51,8 @@
 	<string>CloudNews needs permission to save images from meeting chat</string>
 	<key>NSPhotoLibraryUsageDescription</key>
 	<string>CloudNews needs photo library access to send images in meeting chat</string>
+	<key>io.flutter.embedded_views_preview</key>
+	<true/>
 	<key>UIApplicationSceneManifest</key>
 	<dict>
 		<key>UIApplicationSupportsMultipleScenes</key>

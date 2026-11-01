@@ -26,6 +26,12 @@ android {
         versionName = flutter.versionName
     }
 
+    packaging {
+        jniLibs {
+            pickFirsts += listOf("lib/**/libliteavsdk.so")
+        }
+    }
+
     buildTypes {
         release {
             signingConfig = signingConfigs.getByName("debug")
@@ -36,9 +42,4 @@ android {
 
 flutter {
     source = "../.."
-}
-
-dependencies {
-    // io.trtc.uikit:common's foreground services call TUILogin but don't declare TUICore.
-    implementation("com.tencent.liteav.tuikit:tuicore:9.0.7652")
 }

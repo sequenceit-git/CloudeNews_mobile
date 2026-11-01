@@ -12,34 +12,22 @@
 @import app_links;
 #endif
 
-#if __has_include(<atomic_x_core/AtomicXCorePlugin.h>)
-#import <atomic_x_core/AtomicXCorePlugin.h>
+#if __has_include(<file_picker/FilePickerPlugin.h>)
+#import <file_picker/FilePickerPlugin.h>
 #else
-@import atomic_x_core;
+@import file_picker;
 #endif
 
-#if __has_include(<live_uikit_barrage/BarragePlugin.h>)
-#import <live_uikit_barrage/BarragePlugin.h>
+#if __has_include(<image_picker_ios/ImagePickerPlugin.h>)
+#import <image_picker_ios/ImagePickerPlugin.h>
 #else
-@import live_uikit_barrage;
+@import image_picker_ios;
 #endif
 
-#if __has_include(<rtc_room_engine_impl/RtcRoomEngine.h>)
-#import <rtc_room_engine_impl/RtcRoomEngine.h>
+#if __has_include(<permission_handler_apple/PermissionHandlerPlugin.h>)
+#import <permission_handler_apple/PermissionHandlerPlugin.h>
 #else
-@import rtc_room_engine_impl;
-#endif
-
-#if __has_include(<shared_preferences_foundation/SharedPreferencesPlugin.h>)
-#import <shared_preferences_foundation/SharedPreferencesPlugin.h>
-#else
-@import shared_preferences_foundation;
-#endif
-
-#if __has_include(<sqflite_darwin/SqflitePlugin.h>)
-#import <sqflite_darwin/SqflitePlugin.h>
-#else
-@import sqflite_darwin;
+@import permission_handler_apple;
 #endif
 
 #if __has_include(<super_player/SuperPlayerPlugin.h>)
@@ -48,34 +36,10 @@
 @import super_player;
 #endif
 
-#if __has_include(<tencent_chat_uikit/TencentChatUikitPlugin.h>)
-#import <tencent_chat_uikit/TencentChatUikitPlugin.h>
-#else
-@import tencent_chat_uikit;
-#endif
-
-#if __has_include(<tencent_cloud_chat_sdk/TencentCloudChatSdkPlugin.h>)
-#import <tencent_cloud_chat_sdk/TencentCloudChatSdkPlugin.h>
-#else
-@import tencent_cloud_chat_sdk;
-#endif
-
-#if __has_include(<tencent_conference_uikit/TencentConferenceUikitPlugin.h>)
-#import <tencent_conference_uikit/TencentConferenceUikitPlugin.h>
-#else
-@import tencent_conference_uikit;
-#endif
-
 #if __has_include(<tencent_rtc_sdk/TencentRTCCloud.h>)
 #import <tencent_rtc_sdk/TencentRTCCloud.h>
 #else
 @import tencent_rtc_sdk;
-#endif
-
-#if __has_include(<tuikit_atomic_x/AtomicXPlugin.h>)
-#import <tuikit_atomic_x/AtomicXPlugin.h>
-#else
-@import tuikit_atomic_x;
 #endif
 
 #if __has_include(<url_launcher_ios/URLLauncherPlugin.h>)
@@ -88,17 +52,11 @@
 
 + (void)registerWithRegistry:(NSObject<FlutterPluginRegistry>*)registry {
   [AppLinksIosPlugin registerWithRegistrar:[registry registrarForPlugin:@"AppLinksIosPlugin"]];
-  [AtomicXCorePlugin registerWithRegistrar:[registry registrarForPlugin:@"AtomicXCorePlugin"]];
-  [BarragePlugin registerWithRegistrar:[registry registrarForPlugin:@"BarragePlugin"]];
-  [RtcRoomEngine registerWithRegistrar:[registry registrarForPlugin:@"RtcRoomEngine"]];
-  [SharedPreferencesPlugin registerWithRegistrar:[registry registrarForPlugin:@"SharedPreferencesPlugin"]];
-  [SqflitePlugin registerWithRegistrar:[registry registrarForPlugin:@"SqflitePlugin"]];
+  [FilePickerPlugin registerWithRegistrar:[registry registrarForPlugin:@"FilePickerPlugin"]];
+  [ImagePickerPlugin registerWithRegistrar:[registry registrarForPlugin:@"ImagePickerPlugin"]];
+  [PermissionHandlerPlugin registerWithRegistrar:[registry registrarForPlugin:@"PermissionHandlerPlugin"]];
   [SuperPlayerPlugin registerWithRegistrar:[registry registrarForPlugin:@"SuperPlayerPlugin"]];
-  [TencentChatUikitPlugin registerWithRegistrar:[registry registrarForPlugin:@"TencentChatUikitPlugin"]];
-  [TencentCloudChatSdkPlugin registerWithRegistrar:[registry registrarForPlugin:@"TencentCloudChatSdkPlugin"]];
-  [TencentConferenceUikitPlugin registerWithRegistrar:[registry registrarForPlugin:@"TencentConferenceUikitPlugin"]];
   [TencentRTCCloud registerWithRegistrar:[registry registrarForPlugin:@"TencentRTCCloud"]];
-  [AtomicXPlugin registerWithRegistrar:[registry registrarForPlugin:@"AtomicXPlugin"]];
   [URLLauncherPlugin registerWithRegistrar:[registry registrarForPlugin:@"URLLauncherPlugin"]];
 }
 

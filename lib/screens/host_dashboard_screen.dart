@@ -1,4 +1,3 @@
-import 'package:atomic_x_core/atomicxcore.dart';
 import 'package:flutter/material.dart';
 
 import '../l10n/language_scope.dart';
@@ -42,9 +41,6 @@ class _HostDashboardScreenState extends State<HostDashboardScreen> {
 
   Future<void> _signOut() async {
     ApiService.instance.signOut();
-    if (LoginStore.shared.loginState.loginStatus == LoginStatus.logined) {
-      await LoginStore.shared.logout();
-    }
     if (mounted) Navigator.of(context).popUntil((route) => route.isFirst);
   }
 
