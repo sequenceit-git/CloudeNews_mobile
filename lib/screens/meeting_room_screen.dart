@@ -50,6 +50,7 @@ class _MeetingRoomScreenState extends State<MeetingRoomScreen> {
   bool _isFrontCamera = true;
   bool _isSpeakerPhone = true;
   bool _isSharingScreen = false;
+  bool _wasCameraOnBeforeScreenShare = false;
   bool _isChatOpen = false;
   bool _isScreenShareFit = true;
   String? _activeScreenSharerName;
@@ -164,7 +165,7 @@ class _MeetingRoomScreenState extends State<MeetingRoomScreen> {
   void _onMeetingEndedByHost() {
     if (_isExiting || !mounted) return;
     final strings = context.strings;
-    showErrorSnack(context, strings.hostEndedMeetingNotice);
+    showWarningSnack(context, strings.hostEndedMeetingNotice);
     _exitAndNotify(isHostEnding: false);
   }
 
@@ -181,7 +182,7 @@ class _MeetingRoomScreenState extends State<MeetingRoomScreen> {
     });
 
     if (!wasHost && isNowHost) {
-      showErrorSnack(context, context.strings.youAreNowHost);
+      showSuccessSnack(context, context.strings.youAreNowHost);
     }
     _fetchParticipants();
   }
@@ -379,8 +380,18 @@ class _MeetingRoomScreenState extends State<MeetingRoomScreen> {
         },
         onScreenCaptureStopped: (reason) {
           if (!mounted) return;
-          setState(() => _isSharingScreen = false);
-          _broadcastTrtcCommand({'action': 'screen_share_stopped'});
+          setState(() {
+            _isSharingScreen = false;
+            if (_wasCameraOnBeforeScreenShare) {
+              _wasCameraOnBeforeScreenShare = false;
+              _isCameraOff = false;
+              _trtcCloud?.muteLocalVideo(TRTCVideoStreamType.big, false);
+            }
+          });
+          _broadcastTrtcCommand({
+            'action': 'screen_share_stopped',
+            'sharerId': widget.ticket.trtc.userId,
+          });
         },
         onUserVoiceVolume: (userVolumes, totalVolume) {
           if (!mounted) return;
@@ -404,15 +415,23 @@ class _MeetingRoomScreenState extends State<MeetingRoomScreen> {
               } else if (action == 'screen_share_started') {
                 final name = data['sharerName'] as String? ?? 'Someone';
                 final id = data['sharerId'] as String? ?? '';
+                final myCleanId = widget.ticket.trtc.userId.replaceAll('-', '');
+                final sharerCleanId = id.replaceAll('-', '');
                 setState(() {
                   _activeScreenSharerName = name;
-                  if (id.isNotEmpty && id != widget.ticket.trtc.userId) {
+                  if (sharerCleanId.isNotEmpty && sharerCleanId != myCleanId) {
                     _subStreamUsers.add(id);
                   }
                 });
               } else if (action == 'screen_share_stopped') {
+                final id = data['sharerId'] as String?;
                 setState(() {
                   _activeScreenSharerName = null;
+                  if (id != null && id.isNotEmpty) {
+                    _subStreamUsers.remove(id);
+                  } else {
+                    _subStreamUsers.clear();
+                  }
                 });
               } else if (action == 'mic_state') {
                 final isMuted = data['isMuted'] as bool? ?? false;
@@ -491,7 +510,7 @@ class _MeetingRoomScreenState extends State<MeetingRoomScreen> {
     if (_remoteParticipants.isNotEmpty || !mounted) return;
 
     final strings = context.strings;
-    showErrorSnack(context, strings.soloTimeoutNotice);
+    showWarningSnack(context, strings.soloTimeoutNotice);
     await _exitAndNotify(isHostEnding: true);
   }
 
@@ -501,7 +520,10 @@ class _MeetingRoomScreenState extends State<MeetingRoomScreen> {
     try {
       if (_isSharingScreen) {
         _trtcCloud?.stopScreenCapture();
-        _broadcastTrtcCommand({'action': 'screen_share_stopped'});
+        _broadcastTrtcCommand({
+          'action': 'screen_share_stopped',
+          'sharerId': widget.ticket.trtc.userId,
+        });
         _isSharingScreen = false;
       }
       _trtcCloud?.stopLocalPreview();
@@ -549,22 +571,44 @@ class _MeetingRoomScreenState extends State<MeetingRoomScreen> {
   void _toggleScreenShare() {
     if (_isSharingScreen) {
       _trtcCloud?.stopScreenCapture();
-      _broadcastTrtcCommand({'action': 'screen_share_stopped'});
-      setState(() => _isSharingScreen = false);
+      _broadcastTrtcCommand({
+        'action': 'screen_share_stopped',
+        'sharerId': widget.ticket.trtc.userId,
+      });
+      setState(() {
+        _isSharingScreen = false;
+        if (_wasCameraOnBeforeScreenShare) {
+          _wasCameraOnBeforeScreenShare = false;
+          _isCameraOff = false;
+          _trtcCloud?.muteLocalVideo(TRTCVideoStreamType.big, false);
+        }
+      });
       return;
     }
 
     // Check if another participant is currently sharing the screen
+    final myCleanId = widget.ticket.trtc.userId.replaceAll('-', '');
+    final remoteSubStreamUsers = _subStreamUsers.where((uid) => uid.replaceAll('-', '') != myCleanId).toList();
+
     String? activeSharerName;
-    if (_subStreamUsers.isNotEmpty) {
-      activeSharerName = _getDisplayNameForUser(_subStreamUsers.first);
-    } else if (_activeScreenSharerName != null && _activeScreenSharerName!.isNotEmpty) {
+    if (remoteSubStreamUsers.isNotEmpty) {
+      activeSharerName = _getDisplayNameForUser(remoteSubStreamUsers.first);
+    } else if (_activeScreenSharerName != null &&
+               _activeScreenSharerName!.isNotEmpty &&
+               _activeScreenSharerName != widget.displayName) {
       activeSharerName = _activeScreenSharerName;
     }
 
     if (activeSharerName != null) {
-      showErrorSnack(context, context.strings.otherUserSharingScreen(activeSharerName));
+      showWarningSnack(context, context.strings.otherUserSharingScreen(activeSharerName));
       return;
+    }
+
+    // Seamlessly pause camera preview while sharing screen to avoid OS hardware contention
+    if (!_isCameraOff) {
+      _wasCameraOnBeforeScreenShare = true;
+      _trtcCloud?.muteLocalVideo(TRTCVideoStreamType.big, true);
+      setState(() => _isCameraOff = true);
     }
 
     try {
@@ -592,12 +636,18 @@ class _MeetingRoomScreenState extends State<MeetingRoomScreen> {
     } catch (e) {
       debugPrint('[TRTC] startScreenCapture error: $e');
       if (mounted) showErrorSnack(context, 'Screen share error: $e');
+      if (_wasCameraOnBeforeScreenShare) {
+        _wasCameraOnBeforeScreenShare = false;
+        _isCameraOff = false;
+        _trtcCloud?.muteLocalVideo(TRTCVideoStreamType.big, false);
+        if (mounted) setState(() {});
+      }
     }
   }
 
   void _copyMeetingCode() {
     Clipboard.setData(ClipboardData(text: widget.ticket.meeting.meetingCode));
-    showErrorSnack(context, context.strings.codeCopied);
+    showSuccessSnack(context, context.strings.codeCopied);
   }
 
   Future<void> _openChatSheet() async {

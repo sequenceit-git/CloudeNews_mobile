@@ -314,8 +314,59 @@ class DeviceToggle extends StatelessWidget {
   }
 }
 
-void showErrorSnack(BuildContext context, String message) {
+enum SnackType { success, warning, info, error }
+
+void showAppSnack(
+  BuildContext context,
+  String message, {
+  SnackType type = SnackType.info,
+  Duration duration = const Duration(seconds: 3),
+}) {
+  final (bg, iconColor, iconData) = switch (type) {
+    SnackType.success => (const Color(0xFF10B981), Colors.white, Icons.check_circle_outline),
+    SnackType.warning => (const Color(0xFFF59E0B), Colors.white, Icons.warning_amber_rounded),
+    SnackType.info => (const Color(0xFF06B6D4), Colors.white, Icons.info_outline),
+    SnackType.error => (const Color(0xFFEF4444), Colors.white, Icons.error_outline),
+  };
+
   ScaffoldMessenger.of(context)
     ..hideCurrentSnackBar()
-    ..showSnackBar(SnackBar(content: Text(message), backgroundColor: AppColors.danger));
+    ..showSnackBar(
+      SnackBar(
+        behavior: SnackBarBehavior.floating,
+        margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+        backgroundColor: bg,
+        duration: duration,
+        content: Row(
+          children: [
+            Icon(iconData, color: iconColor, size: 20),
+            const SizedBox(width: 10),
+            Expanded(
+              child: Text(
+                message,
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontSize: 13,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
 }
+
+void showSuccessSnack(BuildContext context, String message) =>
+    showAppSnack(context, message, type: SnackType.success);
+
+void showWarningSnack(BuildContext context, String message) =>
+    showAppSnack(context, message, type: SnackType.warning);
+
+void showInfoSnack(BuildContext context, String message) =>
+    showAppSnack(context, message, type: SnackType.info);
+
+void showErrorSnack(BuildContext context, String message) =>
+    showAppSnack(context, message, type: SnackType.error);
