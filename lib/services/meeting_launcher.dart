@@ -3,7 +3,6 @@ import 'package:permission_handler/permission_handler.dart';
 
 import '../models/models.dart';
 import '../screens/meeting_room_screen.dart';
-import 'api_service.dart';
 
 class MeetingLaunchException implements Exception {
   final int code;
@@ -15,7 +14,6 @@ class MeetingLaunchException implements Exception {
   String toString() => 'MeetingLaunchException($code, $detail)';
 }
 
-/// Opens the plain TRTC room and reports leave / end back to the CloudNews server.
 class MeetingLauncher {
   MeetingLauncher._();
 
@@ -35,14 +33,14 @@ class MeetingLauncher {
     if (_inMeeting) return;
     _inMeeting = true;
     try {
-      final camera = await Permission.camera.request();
-      final microphone = await Permission.microphone.request();
-      if (!camera.isGranted || !microphone.isGranted) {
-        throw const MeetingLaunchException(0, 'Camera and microphone permission are required');
-      }
+      // 1. Request microphone and camera permissions
+      await [Permission.camera, Permission.microphone].request();
       if (!context.mounted) return;
 
-      final exit = await Navigator.of(context).push<MeetingExit>(MaterialPageRoute<MeetingExit>(
+      final navigator = Navigator.of(context);
+
+      // 2. Launch MeetingRoomScreen
+      await navigator.push(MaterialPageRoute<void>(
         settings: const RouteSettings(name: roomRouteName),
         builder: (_) => MeetingRoomScreen(
           ticket: ticket,
@@ -51,18 +49,6 @@ class MeetingLauncher {
           cameraOn: cameraOn,
         ),
       ));
-
-      final api = ApiService.instance;
-      final meetingId = ticket.meeting.id;
-      try {
-        if (exit == MeetingExit.hostEnded && ticket.trtc.isHost && api.isHostSignedIn) {
-          await api.endMeeting(meetingId);
-        } else if (exit != MeetingExit.hostEnded) {
-          await api.leaveMeeting(meetingId, ticket.trtc.userId);
-        }
-      } on ApiException catch (error) {
-        debugPrint('[Meeting] server update failed: $error');
-      }
     } finally {
       _inMeeting = false;
     }

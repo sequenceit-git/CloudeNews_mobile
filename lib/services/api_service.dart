@@ -75,6 +75,19 @@ class ApiService {
     return MeetingTicket.fromJson(data);
   }
 
+  Future<List<Map<String, dynamic>>> getParticipants(String code) async {
+    final res = await _send(
+      'GET',
+      '/meetings/${Uri.encodeComponent(code)}/participants',
+      fallbackError: 'Failed to fetch participants',
+    );
+    final list = res['participants'];
+    if (list is List) {
+      return list.map((e) => Map<String, dynamic>.from(e as Map)).toList();
+    }
+    return [];
+  }
+
   /// Records that this person left. The server ends the meeting 5 minutes
   /// after the room becomes empty.
   Future<void> leaveMeeting(String meetingId, String userId) async {
@@ -86,12 +99,26 @@ class ApiService {
     );
   }
 
-  Future<void> endMeeting(String meetingId) async {
+  Future<void> endMeeting(String meetingId, {String? userId}) async {
     await _send(
       'POST',
       '/meetings/$meetingId/end',
-      auth: true,
+      auth: _token != null,
+      body: userId != null ? {'userId': userId} : null,
       fallbackError: 'Failed to end meeting',
+    );
+  }
+
+  Future<Map<String, dynamic>> transferHost(String meetingId, String currentHostUserId, String newHostUserId) async {
+    return await _send(
+      'POST',
+      '/meetings/$meetingId/transfer-host',
+      auth: _token != null,
+      body: {
+        'currentHostUserId': currentHostUserId,
+        'newHostUserId': newHostUserId,
+      },
+      fallbackError: 'Failed to transfer host',
     );
   }
 

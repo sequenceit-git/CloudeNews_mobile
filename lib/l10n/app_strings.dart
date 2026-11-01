@@ -65,6 +65,42 @@ class AppStrings {
   final String permissionDenied;
   final String roomLoginFailed;
 
+  // In-room controls
+  final String switchCamera;
+  final String speakerOn;
+  final String earpieceOn;
+  final String startScreenShare;
+  final String stopScreenShare;
+  final String screenShareActive;
+  final String Function(String name) otherUserSharingScreen;
+  final String leaveMeeting;
+  final String endMeetingForAll;
+  final String confirmLeave;
+  final String confirmEnd;
+  final String cancel;
+  final String copyMeetingCode;
+  final String codeCopied;
+  final String membersTitle;
+  final String meBadge;
+  final String hostBadge;
+  final String hostEndedMeetingNotice;
+  final String soloTimeoutNotice;
+  final String transferHostTitle;
+  final String transferHostSubtitle;
+  final String transferAndLeave;
+  final String youAreNowHost;
+  final String aloneInMeeting;
+  final String leaveAndEnd;
+
+  // Chat & file sharing
+  final String chatTitle;
+  final String typeMessageHint;
+  final String sendBtn;
+  final String attachPhoto;
+  final String attachFile;
+  final String uploadingFile;
+  final String fileSizeLimitExceeded;
+
   const AppStrings({
     required this.appName,
     required this.tagline,
@@ -113,6 +149,38 @@ class AppStrings {
     required this.meetingTitleFor,
     required this.permissionDenied,
     required this.roomLoginFailed,
+    required this.switchCamera,
+    required this.speakerOn,
+    required this.earpieceOn,
+    required this.startScreenShare,
+    required this.stopScreenShare,
+    required this.screenShareActive,
+    required this.otherUserSharingScreen,
+    required this.leaveMeeting,
+    required this.endMeetingForAll,
+    required this.confirmLeave,
+    required this.confirmEnd,
+    required this.cancel,
+    required this.copyMeetingCode,
+    required this.codeCopied,
+    required this.membersTitle,
+    required this.meBadge,
+    required this.hostBadge,
+    required this.hostEndedMeetingNotice,
+    required this.soloTimeoutNotice,
+    required this.transferHostTitle,
+    required this.transferHostSubtitle,
+    required this.transferAndLeave,
+    required this.youAreNowHost,
+    required this.aloneInMeeting,
+    required this.leaveAndEnd,
+    required this.chatTitle,
+    required this.typeMessageHint,
+    required this.sendBtn,
+    required this.attachPhoto,
+    required this.attachFile,
+    required this.uploadingFile,
+    required this.fileSizeLimitExceeded,
   });
 
   static AppStrings of(AppLanguage language) => language == AppLanguage.zh ? zh : en;
@@ -166,6 +234,38 @@ class AppStrings {
     meetingTitleFor: (host) => "$host's Meeting",
     permissionDenied: 'Camera or microphone permission was denied. You can enable it later in Settings.',
     roomLoginFailed: 'Could not connect to the meeting service. Please try again.',
+    switchCamera: 'Switch Camera',
+    speakerOn: 'Speaker',
+    earpieceOn: 'Earpiece',
+    startScreenShare: 'Share Screen',
+    stopScreenShare: 'Stop Share',
+    screenShareActive: 'Sharing Screen',
+    otherUserSharingScreen: (name) => '$name is currently sharing the screen.',
+    leaveMeeting: 'Leave Meeting',
+    endMeetingForAll: 'End Meeting for All',
+    confirmLeave: 'Are you sure you want to leave this meeting?',
+    confirmEnd: 'Are you sure you want to end this meeting for all participants?',
+    cancel: 'Cancel',
+    copyMeetingCode: 'Copy Meeting Code',
+    codeCopied: 'Meeting code copied to clipboard',
+    membersTitle: 'Participants',
+    meBadge: 'Me',
+    hostBadge: 'Host',
+    hostEndedMeetingNotice: 'This meeting was ended by the host',
+    soloTimeoutNotice: 'Meeting ended automatically due to inactivity',
+    transferHostTitle: 'Assign New Host',
+    transferHostSubtitle: 'Please select a participant to become the new host before you leave:',
+    transferAndLeave: 'Transfer & Leave',
+    youAreNowHost: 'You are now the host of this meeting',
+    aloneInMeeting: 'You are the only person in the meeting. Leaving will end the meeting.',
+    leaveAndEnd: 'Leave & End',
+    chatTitle: 'Meeting Chat',
+    typeMessageHint: 'Type a message...',
+    sendBtn: 'Send',
+    attachPhoto: 'Send Photo',
+    attachFile: 'Send Document',
+    uploadingFile: 'Uploading...',
+    fileSizeLimitExceeded: 'File size cannot exceed 15MB',
   );
 
   static final zh = AppStrings(
@@ -216,5 +316,37 @@ class AppStrings {
     meetingTitleFor: (host) => '$host 的会议',
     permissionDenied: '摄像头或麦克风权限被拒绝，您可以稍后在系统设置中开启。',
     roomLoginFailed: '无法连接会议服务，请重试。',
+    switchCamera: '翻转摄像头',
+    speakerOn: '扬声器',
+    earpieceOn: '听筒',
+    startScreenShare: '共享屏幕',
+    stopScreenShare: '停止共享',
+    screenShareActive: '正在共享屏幕',
+    otherUserSharingScreen: (name) => '$name 目前正在共享屏幕',
+    leaveMeeting: '离开会议',
+    endMeetingForAll: '结束全体会议',
+    confirmLeave: '确定离开当前会议吗？',
+    confirmEnd: '确定结束全体会议吗？所有参会者将被移出房间。',
+    cancel: '取消',
+    copyMeetingCode: '复制会议号',
+    codeCopied: '会议号已复制到剪贴板',
+    membersTitle: '参会成员',
+    meBadge: '我',
+    hostBadge: '主持人',
+    hostEndedMeetingNotice: '主持人已结束本次会议',
+    soloTimeoutNotice: '由于长时间无其他参会者，会议已自动结束',
+    transferHostTitle: '转交主持人',
+    transferHostSubtitle: '离开前请选择一位参会成员作为新主持人：',
+    transferAndLeave: '转交并离开',
+    youAreNowHost: '您已成为当前会议主持人',
+    aloneInMeeting: '您是会议中唯一的成员，离开将结束此会议。',
+    leaveAndEnd: '离开并结束',
+    chatTitle: '会议聊天',
+    typeMessageHint: '输入消息...',
+    sendBtn: '发送',
+    attachPhoto: '发送图片',
+    attachFile: '发送文件',
+    uploadingFile: '正在上传...',
+    fileSizeLimitExceeded: '文件不能超过 15MB',
   );
 }
