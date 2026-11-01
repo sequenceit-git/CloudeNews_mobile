@@ -74,6 +74,7 @@ class _MeetingRoomScreenState extends State<MeetingRoomScreen> {
   final Map<String, int> _userVolumeMap = {};
   final Map<String, String> _userDisplayNameMap = {};
   final List<MeetingChatMessage> _meetingChatMessages = [];
+  int _unreadChatCount = 0;
 
   Timer? _meetingTimer;
   Timer? _soloHostTimer;
@@ -130,7 +131,14 @@ class _MeetingRoomScreenState extends State<MeetingRoomScreen> {
               } else if (type == 'text' || type == 'image' || type == 'file') {
                 final msg = MeetingChatMessage.fromJson(json);
                 if (!_meetingChatMessages.any((m) => m.id == msg.id)) {
-                  setState(() => _meetingChatMessages.add(msg));
+                  setState(() {
+                    _meetingChatMessages.add(msg);
+                    final myCleanId = widget.ticket.trtc.userId.replaceAll('-', '');
+                    final senderCleanId = msg.userId.replaceAll('-', '');
+                    if (!_isChatOpen && senderCleanId != myCleanId) {
+                      _unreadChatCount++;
+                    }
+                  });
                 }
               }
             }
@@ -593,7 +601,10 @@ class _MeetingRoomScreenState extends State<MeetingRoomScreen> {
   }
 
   Future<void> _openChatSheet() async {
-    setState(() => _isChatOpen = true);
+    setState(() {
+      _isChatOpen = true;
+      _unreadChatCount = 0;
+    });
     try {
       if (Platform.isIOS) {
         // On iOS, open as a fullscreen modal dialog to prevent native UiKitView video tiles from overlapping
@@ -660,7 +671,10 @@ class _MeetingRoomScreenState extends State<MeetingRoomScreen> {
       }
     } finally {
       if (mounted) {
-        setState(() => _isChatOpen = false);
+        setState(() {
+          _isChatOpen = false;
+          _unreadChatCount = 0;
+        });
       }
     }
   }
@@ -1591,6 +1605,8 @@ class _MeetingRoomScreenState extends State<MeetingRoomScreen> {
               icon: Icons.chat_bubble_outline,
               label: strings.chatTitle,
               onPressed: _openChatSheet,
+              hasBadge: _unreadChatCount > 0,
+              badgeCount: _unreadChatCount,
             ),
           ),
           // Members List Button
@@ -1614,6 +1630,8 @@ class _ControlButton extends StatelessWidget {
     required this.onPressed,
     this.isActive = false,
     this.activeColor = AppColors.primary,
+    this.hasBadge = false,
+    this.badgeCount = 0,
   });
 
   final IconData icon;
@@ -1621,6 +1639,8 @@ class _ControlButton extends StatelessWidget {
   final VoidCallback onPressed;
   final bool isActive;
   final Color activeColor;
+  final bool hasBadge;
+  final int badgeCount;
 
   @override
   Widget build(BuildContext context) {
@@ -1635,14 +1655,36 @@ class _ControlButton extends StatelessWidget {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Container(
-              padding: const EdgeInsets.all(10),
-              decoration: BoxDecoration(
-                color: bg,
-                shape: BoxShape.circle,
-                border: Border.all(color: isActive ? activeColor.withValues(alpha: 0.5) : Colors.transparent),
-              ),
-              child: Icon(icon, color: fg, size: 20),
+            Stack(
+              clipBehavior: Clip.none,
+              children: [
+                Container(
+                  padding: const EdgeInsets.all(10),
+                  decoration: BoxDecoration(
+                    color: bg,
+                    shape: BoxShape.circle,
+                    border: Border.all(color: isActive ? activeColor.withValues(alpha: 0.5) : Colors.transparent),
+                  ),
+                  child: Icon(icon, color: fg, size: 20),
+                ),
+                if (hasBadge)
+                  Positioned(
+                    top: 2,
+                    right: 2,
+                    child: Container(
+                      width: 9,
+                      height: 9,
+                      decoration: BoxDecoration(
+                        color: AppColors.danger,
+                        shape: BoxShape.circle,
+                        border: Border.all(
+                          color: const Color(0xFF0F141C),
+                          width: 1.5,
+                        ),
+                      ),
+                    ),
+                  ),
+              ],
             ),
             const SizedBox(height: 4),
             Text(
