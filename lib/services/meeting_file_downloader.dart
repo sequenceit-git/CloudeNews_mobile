@@ -11,26 +11,39 @@ class MeetingFileDownloader {
   static final MeetingFileDownloader instance = MeetingFileDownloader._();
 
   /// Gets the appropriate storage directory for downloads.
-  /// On Android, prefers the standard user-visible `/storage/emulated/0/Download`.
-  /// On iOS, uses application documents directory.
+  /// Uses app-scoped external storage on Android and documents directory on iOS,
+  /// ensuring full read/write access without Scoped Storage restrictions.
   Future<Directory> getDownloadDirectory() async {
     if (Platform.isAndroid) {
       try {
-        final publicDownloadDir = Directory('/storage/emulated/0/Download');
-        if (await publicDownloadDir.exists()) {
-          return publicDownloadDir;
+        final extDirs = await getExternalStorageDirectories(type: StorageDirectory.downloads);
+        if (extDirs != null && extDirs.isNotEmpty) {
+          final dir = extDirs.first;
+          if (!await dir.exists()) {
+            await dir.create(recursive: true);
+          }
+          return dir;
         }
       } catch (_) {}
 
       try {
-        final extDirs = await getExternalStorageDirectories(type: StorageDirectory.downloads);
-        if (extDirs != null && extDirs.isNotEmpty) {
-          return extDirs.first;
+        final extDir = await getExternalStorageDirectory();
+        if (extDir != null) {
+          final dir = Directory('${extDir.path}/Downloads');
+          if (!await dir.exists()) {
+            await dir.create(recursive: true);
+          }
+          return dir;
         }
       } catch (_) {}
     }
 
-    return await getApplicationDocumentsDirectory();
+    final appDocsDir = await getApplicationDocumentsDirectory();
+    final dir = Directory('${appDocsDir.path}/downloads');
+    if (!await dir.exists()) {
+      await dir.create(recursive: true);
+    }
+    return dir;
   }
 
   /// Resolves the full target file path for a given filename.
@@ -41,11 +54,19 @@ class MeetingFileDownloader {
     return '${dir.path}/$name';
   }
 
-  /// Checks if the file is already downloaded and present on disk.
+  /// Checks if the file is already downloaded, non-empty, and readable by this app.
   bool isFileDownloaded(String localPath) {
     if (localPath.isEmpty) return false;
     final file = File(localPath);
-    return file.existsSync() && file.lengthSync() > 0;
+    if (!file.existsSync()) return false;
+    try {
+      if (file.lengthSync() == 0) return false;
+      final raf = file.openSync(mode: FileMode.read);
+      raf.closeSync();
+      return true;
+    } catch (_) {
+      return false;
+    }
   }
 
   /// Downloads a file from [url] to [localPath] with progress notifications.

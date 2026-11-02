@@ -2,7 +2,6 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 
-import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:image_picker/image_picker.dart';
@@ -80,6 +79,14 @@ class MeetingChatSheet extends StatefulWidget {
   State<MeetingChatSheet> createState() => _MeetingChatSheetState();
 }
 
+class _DownloadToastData {
+  final String filename;
+  final String localPath;
+  final int timestamp;
+  _DownloadToastData({required this.filename, required this.localPath})
+      : timestamp = DateTime.now().millisecondsSinceEpoch;
+}
+
 class _MeetingChatSheetState extends State<MeetingChatSheet> {
   final _textController = TextEditingController();
   final _scrollController = ScrollController();
@@ -90,6 +97,8 @@ class _MeetingChatSheetState extends State<MeetingChatSheet> {
   bool _uploading = false;
   final Map<String, String> _localFilePaths = {};
   final Map<String, double> _downloadProgress = {};
+  _DownloadToastData? _topDownloadToast;
+  Timer? _toastDismissTimer;
 
   @override
   void initState() {
@@ -100,6 +109,7 @@ class _MeetingChatSheetState extends State<MeetingChatSheet> {
 
   @override
   void dispose() {
+    _toastDismissTimer?.cancel();
     _channelSub?.cancel();
     _channel?.sink.close();
     _textController.dispose();
@@ -173,24 +183,16 @@ class _MeetingChatSheetState extends State<MeetingChatSheet> {
     _textController.clear();
   }
 
-  Future<void> _pickAndSendImage() async {
+  Future<void> _pickAndSendImage({ImageSource source = ImageSource.gallery}) async {
     try {
       final picker = ImagePicker();
-      final picked = await picker.pickImage(source: ImageSource.gallery, imageQuality: 80);
+      final picked = await picker.pickImage(source: source, imageQuality: 80);
       if (picked != null) {
         await _uploadFile(File(picked.path), picked.name);
       }
-    } catch (_) {}
-  }
-
-  Future<void> _pickAndSendFile() async {
-    try {
-      final result = await FilePicker.platform.pickFiles();
-      if (result != null && result.files.single.path != null) {
-        final path = result.files.single.path!;
-        await _uploadFile(File(path), result.files.single.name);
-      }
-    } catch (_) {}
+    } catch (e) {
+      debugPrint('[Chat Image Picker Error] $e');
+    }
   }
 
   Future<void> _uploadFile(File file, String filename) async {
@@ -238,14 +240,9 @@ class _MeetingChatSheetState extends State<MeetingChatSheet> {
       if (MeetingFileDownloader.instance.isFileDownloaded(localPath)) {
         _localFilePaths[msg.id] = localPath;
         if (openImmediately) {
-          final res = await MeetingFileDownloader.instance.openFile(localPath);
-          if (res.type != ResultType.done && mounted) {
-            showErrorSnack(context, res.message);
-          }
+          _openFileSafely(localPath);
         } else {
-          if (mounted) {
-            showSuccessSnack(context, '${context.strings.fileSavedNotice}: $filename');
-          }
+          _showTopDownloadToast(filename, localPath);
         }
         return;
       }
@@ -265,13 +262,10 @@ class _MeetingChatSheetState extends State<MeetingChatSheet> {
           _localFilePaths[msg.id] = localPath;
           _downloadProgress.remove(msg.id);
         });
-        showSuccessSnack(context, '${context.strings.fileSavedNotice}: $filename');
-      }
-
-      if (openImmediately) {
-        final res = await MeetingFileDownloader.instance.openFile(localPath);
-        if (res.type != ResultType.done && mounted) {
-          showErrorSnack(context, res.message);
+        if (openImmediately) {
+          _openFileSafely(localPath);
+        } else {
+          _showTopDownloadToast(filename, localPath);
         }
       }
     } catch (e) {
@@ -279,6 +273,28 @@ class _MeetingChatSheetState extends State<MeetingChatSheet> {
         setState(() => _downloadProgress.remove(msg.id));
         showErrorSnack(context, 'Download error: $e');
       }
+    }
+  }
+
+  void _showTopDownloadToast(String filename, String localPath) {
+    if (!mounted) return;
+    _toastDismissTimer?.cancel();
+    setState(() {
+      _topDownloadToast = _DownloadToastData(filename: filename, localPath: localPath);
+    });
+    _toastDismissTimer = Timer(const Duration(seconds: 7), () {
+      if (mounted) setState(() => _topDownloadToast = null);
+    });
+  }
+
+  Future<void> _openFileSafely(String localPath) async {
+    try {
+      final res = await MeetingFileDownloader.instance.openFile(localPath);
+      if (res.type != ResultType.done && mounted) {
+        showErrorSnack(context, res.message);
+      }
+    } catch (e) {
+      if (mounted) showErrorSnack(context, 'Could not open file: $e');
     }
   }
 
@@ -475,41 +491,184 @@ class _MeetingChatSheetState extends State<MeetingChatSheet> {
               ),
             ),
             const Divider(height: 1, color: AppColors.cardBorder),
-            // Messages List
+            // Messages List with Top Swipeable Toast
             Expanded(
-              child: _messages.isEmpty
-                  ? Center(
-                      child: Text(
-                        strings.typeMessageHint,
-                        style: const TextStyle(color: AppColors.textDim, fontSize: 13),
-                      ),
-                    )
-                  : ListView.builder(
-                      controller: _scrollController,
-                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                      itemCount: _messages.length,
-                      itemBuilder: (context, index) {
-                        final msg = _messages[index];
-                        final isMe = msg.userId == widget.userId;
-                        final localPath = _localFilePaths[msg.id];
-                        final isDownloaded = localPath != null &&
-                            MeetingFileDownloader.instance.isFileDownloaded(localPath);
-                        final progress = _downloadProgress[msg.id];
+              child: Stack(
+                children: [
+                  Positioned.fill(
+                    child: _messages.isEmpty
+                        ? Center(
+                            child: Text(
+                              strings.typeMessageHint,
+                              style: const TextStyle(color: AppColors.textDim, fontSize: 13),
+                            ),
+                          )
+                        : ListView.builder(
+                            controller: _scrollController,
+                            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                            itemCount: _messages.length,
+                            itemBuilder: (context, index) {
+                              final msg = _messages[index];
+                              final isMe = msg.userId == widget.userId;
+                              final localPath = _localFilePaths[msg.id];
+                              final isDownloaded = localPath != null &&
+                                  MeetingFileDownloader.instance.isFileDownloaded(localPath);
+                              final progress = _downloadProgress[msg.id];
 
-                        return _MessageBubble(
-                          message: msg,
-                          isMe: isMe,
-                          timeStr: _formatTime(msg.at),
-                          formattedSize: _formatSize(msg.size),
-                          isDownloaded: isDownloaded,
-                          downloadProgress: progress,
-                          onTapImage: () => _showImageViewerDialog(msg),
-                          onTapFile: () => _handleDownloadAndOpen(msg, openImmediately: false),
-                          onDownloadFile: () => _handleDownloadAndOpen(msg, openImmediately: false),
-                          strings: strings,
-                        );
-                      },
+                              return _MessageBubble(
+                                message: msg,
+                                isMe: isMe,
+                                timeStr: _formatTime(msg.at),
+                                formattedSize: _formatSize(msg.size),
+                                isDownloaded: isDownloaded,
+                                downloadProgress: progress,
+                                onTapImage: () => _showImageViewerDialog(msg),
+                                onTapFile: () {
+                                  if (isDownloaded) {
+                                    _openFileSafely(localPath);
+                                  } else {
+                                    _handleDownloadAndOpen(msg, openImmediately: false);
+                                  }
+                                },
+                                onDownloadFile: () {
+                                  if (isDownloaded) {
+                                    _openFileSafely(localPath);
+                                  } else {
+                                    _handleDownloadAndOpen(msg, openImmediately: false);
+                                  }
+                                },
+                                strings: strings,
+                              );
+                            },
+                          ),
+                  ),
+                  if (_topDownloadToast != null)
+                    Positioned(
+                      top: 8,
+                      left: 12,
+                      right: 12,
+                      child: Dismissible(
+                        key: ValueKey(_topDownloadToast!.timestamp),
+                        direction: DismissDirection.horizontal,
+                        onDismissed: (_) {
+                          _toastDismissTimer?.cancel();
+                          setState(() => _topDownloadToast = null);
+                        },
+                        child: Material(
+                          color: Colors.transparent,
+                          child: InkWell(
+                            borderRadius: BorderRadius.circular(14),
+                            onTap: () => _openFileSafely(_topDownloadToast!.localPath),
+                            child: Container(
+                              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                              decoration: BoxDecoration(
+                                color: const Color(0xFF1B2234),
+                                borderRadius: BorderRadius.circular(14),
+                                border: Border.all(
+                                  color: AppColors.cyan.withValues(alpha: 0.5),
+                                  width: 1.2,
+                                ),
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: Colors.black.withValues(alpha: 0.6),
+                                    blurRadius: 16,
+                                    spreadRadius: 2,
+                                    offset: const Offset(0, 4),
+                                  ),
+                                ],
+                              ),
+                              child: Row(
+                                children: [
+                                  Container(
+                                    padding: const EdgeInsets.all(6),
+                                    decoration: BoxDecoration(
+                                      color: AppColors.cyan.withValues(alpha: 0.18),
+                                      shape: BoxShape.circle,
+                                    ),
+                                    child: const Icon(
+                                      Icons.check_circle_rounded,
+                                      color: AppColors.cyan,
+                                      size: 20,
+                                    ),
+                                  ),
+                                  const SizedBox(width: 10),
+                                  Expanded(
+                                    child: Column(
+                                      mainAxisSize: MainAxisSize.min,
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      children: [
+                                        Text(
+                                          _topDownloadToast!.filename,
+                                          maxLines: 1,
+                                          overflow: TextOverflow.ellipsis,
+                                          style: const TextStyle(
+                                            color: Colors.white,
+                                            fontWeight: FontWeight.w700,
+                                            fontSize: 13,
+                                          ),
+                                        ),
+                                        const SizedBox(height: 2),
+                                        Row(
+                                          children: [
+                                            Text(
+                                              strings.tapToViewFile,
+                                              style: const TextStyle(
+                                                color: AppColors.textSecondary,
+                                                fontSize: 11,
+                                              ),
+                                            ),
+                                            const SizedBox(width: 6),
+                                            const Icon(
+                                              Icons.arrow_forward_rounded,
+                                              size: 11,
+                                              color: AppColors.textDim,
+                                            ),
+                                          ],
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                  const SizedBox(width: 8),
+                                  FilledButton(
+                                    style: FilledButton.styleFrom(
+                                      backgroundColor: AppColors.cyan,
+                                      foregroundColor: Colors.black,
+                                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                                      minimumSize: const Size(0, 32),
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(8),
+                                      ),
+                                    ),
+                                    onPressed: () => _openFileSafely(_topDownloadToast!.localPath),
+                                    child: Text(
+                                      strings.openFileAction,
+                                      style: const TextStyle(
+                                        fontSize: 11,
+                                        fontWeight: FontWeight.w800,
+                                      ),
+                                    ),
+                                  ),
+                                  const SizedBox(width: 4),
+                                  InkWell(
+                                    onTap: () {
+                                      _toastDismissTimer?.cancel();
+                                      setState(() => _topDownloadToast = null);
+                                    },
+                                    borderRadius: BorderRadius.circular(16),
+                                    child: const Padding(
+                                      padding: EdgeInsets.all(4),
+                                      child: Icon(Icons.close, size: 16, color: AppColors.textDim),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
                     ),
+                ],
+              ),
             ),
             if (_uploading)
               Padding(
@@ -535,35 +694,10 @@ class _MeetingChatSheetState extends State<MeetingChatSheet> {
                 color: AppColors.background,
                 child: Row(
                   children: [
-                    PopupMenuButton<String>(
-                      icon: const Icon(Icons.add_circle_outline, color: AppColors.cyan, size: 24),
-                      color: AppColors.card,
-                      onSelected: (val) {
-                        if (val == 'photo') _pickAndSendImage();
-                        if (val == 'file') _pickAndSendFile();
-                      },
-                      itemBuilder: (context) => [
-                        PopupMenuItem(
-                          value: 'photo',
-                          child: Row(
-                            children: [
-                              const Icon(Icons.photo_outlined, size: 18, color: AppColors.primaryLight),
-                              const SizedBox(width: 10),
-                              Text(strings.attachPhoto, style: const TextStyle(color: AppColors.text, fontSize: 13)),
-                            ],
-                          ),
-                        ),
-                        PopupMenuItem(
-                          value: 'file',
-                          child: Row(
-                            children: [
-                              const Icon(Icons.insert_drive_file_outlined, size: 18, color: AppColors.cyan),
-                              const SizedBox(width: 10),
-                              Text(strings.attachFile, style: const TextStyle(color: AppColors.text, fontSize: 13)),
-                            ],
-                          ),
-                        ),
-                      ],
+                    IconButton(
+                      icon: const Icon(Icons.add_photo_alternate_rounded, color: AppColors.cyan, size: 24),
+                      tooltip: strings.attachPhoto,
+                      onPressed: () => _pickAndSendImage(source: ImageSource.gallery),
                     ),
                     Expanded(
                       child: Container(
@@ -818,7 +952,7 @@ class _MessageBubble extends StatelessWidget {
                           ),
                         if (formattedSize.isNotEmpty) const SizedBox(width: 6),
                         Text(
-                          isDownloaded ? strings.downloaded : strings.downloadFile,
+                          isDownloaded ? strings.openFile : strings.downloadFile,
                           style: TextStyle(
                             color: isDownloaded ? AppColors.cyan : AppColors.primaryLight,
                             fontSize: 10,
@@ -843,7 +977,7 @@ class _MessageBubble extends StatelessWidget {
                           child: CircularProgressIndicator(strokeWidth: 2, color: AppColors.cyan),
                         )
                       : Icon(
-                          isDownloaded ? Icons.check_circle_rounded : Icons.download_rounded,
+                          isDownloaded ? Icons.file_open_rounded : Icons.download_rounded,
                           size: 20,
                           color: isDownloaded ? AppColors.cyan : Colors.white70,
                         ),

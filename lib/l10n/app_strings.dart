@@ -109,6 +109,8 @@ class AppStrings {
   final String openFile;
   final String fileSavedNotice;
   final String openInGallery;
+  final String openFileAction;
+  final String tapToViewFile;
 
   // Active meeting conflict
   final String activeMeetingOngoingTitle;
@@ -205,6 +207,8 @@ class AppStrings {
     required this.openFile,
     required this.fileSavedNotice,
     required this.openInGallery,
+    required this.openFileAction,
+    required this.tapToViewFile,
     required this.activeMeetingOngoingTitle,
     required this.activeMeetingOngoingDesc,
     required this.rejoinMeetingBtn,
@@ -303,6 +307,8 @@ class AppStrings {
     openFile: 'Open File',
     fileSavedNotice: 'Saved to Downloads',
     openInGallery: 'Open in Media Viewer',
+    openFileAction: 'OPEN',
+    tapToViewFile: 'File downloaded • Tap to view',
     activeMeetingOngoingTitle: 'Active Meeting Ongoing',
     activeMeetingOngoingDesc: (code) =>
         'You already have an active meeting ($code). A host can only conduct one meeting at a time.',
@@ -399,6 +405,8 @@ class AppStrings {
     openFile: '打开文件',
     fileSavedNotice: '已保存至下载目录',
     openInGallery: '在媒体查看器中打开',
+    openFileAction: '打开',
+    tapToViewFile: '文件已下载 • 点击查看',
     activeMeetingOngoingTitle: '已有正在进行的会议',
     activeMeetingOngoingDesc: (code) =>
         '您已有一个正在进行的会议（$code）。主持人同一时间只能主持一个会议。',
