@@ -100,6 +100,18 @@ class AppStrings {
   final String attachFile;
   final String uploadingFile;
   final String fileSizeLimitExceeded;
+  final String downloadFile;
+  final String downloading;
+  final String downloaded;
+  final String openFile;
+  final String fileSavedNotice;
+  final String openInGallery;
+
+  // Active meeting conflict
+  final String activeMeetingOngoingTitle;
+  final String Function(String code) activeMeetingOngoingDesc;
+  final String rejoinMeetingBtn;
+  final String endPreviousAndStartBtn;
 
   const AppStrings({
     required this.appName,
@@ -181,6 +193,16 @@ class AppStrings {
     required this.attachFile,
     required this.uploadingFile,
     required this.fileSizeLimitExceeded,
+    required this.downloadFile,
+    required this.downloading,
+    required this.downloaded,
+    required this.openFile,
+    required this.fileSavedNotice,
+    required this.openInGallery,
+    required this.activeMeetingOngoingTitle,
+    required this.activeMeetingOngoingDesc,
+    required this.rejoinMeetingBtn,
+    required this.endPreviousAndStartBtn,
   });
 
   static AppStrings of(AppLanguage language) => language == AppLanguage.zh ? zh : en;
@@ -266,6 +288,17 @@ class AppStrings {
     attachFile: 'Send Document',
     uploadingFile: 'Uploading...',
     fileSizeLimitExceeded: 'File size cannot exceed 15MB',
+    downloadFile: 'Download',
+    downloading: 'Downloading...',
+    downloaded: 'Downloaded',
+    openFile: 'Open File',
+    fileSavedNotice: 'Saved to Downloads',
+    openInGallery: 'Open in Media Viewer',
+    activeMeetingOngoingTitle: 'Active Meeting Ongoing',
+    activeMeetingOngoingDesc: (code) =>
+        'You already have an active meeting ($code). A host can only conduct one meeting at a time.',
+    rejoinMeetingBtn: 'Rejoin Meeting',
+    endPreviousAndStartBtn: 'End Previous & Start New',
   );
 
   static final zh = AppStrings(
@@ -348,5 +381,16 @@ class AppStrings {
     attachFile: '发送文件',
     uploadingFile: '正在上传...',
     fileSizeLimitExceeded: '文件不能超过 15MB',
+    downloadFile: '下载',
+    downloading: '正在下载...',
+    downloaded: '已下载',
+    openFile: '打开文件',
+    fileSavedNotice: '已保存至下载目录',
+    openInGallery: '在媒体查看器中打开',
+    activeMeetingOngoingTitle: '已有正在进行的会议',
+    activeMeetingOngoingDesc: (code) =>
+        '您已有一个正在进行的会议（$code）。主持人同一时间只能主持一个会议。',
+    rejoinMeetingBtn: '重新加入会议',
+    endPreviousAndStartBtn: '结束原会议并创建新会议',
   );
 }

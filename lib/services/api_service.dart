@@ -17,6 +17,18 @@ class ApiException implements Exception {
   String toString() => message;
 }
 
+class ActiveMeetingConflictException extends ApiException {
+  final String activeMeetingCode;
+  final String activeMeetingId;
+
+  const ActiveMeetingConflictException({
+    required String message,
+    required this.activeMeetingCode,
+    required this.activeMeetingId,
+    super.statusCode,
+  }) : super(message);
+}
+
 /// Client for the CloudNews server (`cloudmeet_web/server`). UserSigs are
 /// always issued by the server; the app never holds the TRTC secret key.
 class ApiService {
@@ -162,6 +174,18 @@ class ApiService {
 
     final ok = res.statusCode >= 200 && res.statusCode < 300;
     if (!ok && !acceptErrorBody) {
+      if (res.statusCode == 409 && data['code'] == 'HOST_ALREADY_IN_MEETING') {
+        final active = data['activeMeeting'] as Map<String, dynamic>?;
+        final activeCode = active?['meetingCode'] as String? ?? '';
+        final activeId = active?['id'] as String? ?? '';
+        final message = data['error'] as String? ?? 'Host already has an active meeting.';
+        throw ActiveMeetingConflictException(
+          message: message,
+          activeMeetingCode: activeCode,
+          activeMeetingId: activeId,
+          statusCode: res.statusCode,
+        );
+      }
       final message = data['error'] ?? data['message'];
       throw ApiException(message is String && message.isNotEmpty ? message : fallbackError,
           statusCode: res.statusCode);

@@ -30,10 +30,105 @@ class _HostDashboardScreenState extends State<HostDashboardScreen> {
       final ticket = await ApiService.instance.createInstantMeeting(strings.meetingTitleFor(widget.host.label));
       if (!mounted) return;
       await MeetingLauncher.enter(context, ticket: ticket, displayName: widget.host.label);
+    } on ActiveMeetingConflictException catch (e) {
+      if (mounted) {
+        _showActiveMeetingDialog(
+          meetingCode: e.activeMeetingCode,
+          meetingId: e.activeMeetingId,
+        );
+      }
     } on ApiException catch (e) {
       if (mounted) setState(() => _error = e.message);
     } on MeetingLaunchException catch (e) {
       if (mounted) setState(() => _error = '${strings.roomLoginFailed} (${e.code})');
+    } finally {
+      if (mounted) setState(() => _loading = false);
+    }
+  }
+
+  void _showActiveMeetingDialog({required String meetingCode, required String meetingId}) {
+    final strings = context.strings;
+
+    showDialog<void>(
+      context: context,
+      barrierDismissible: false,
+      builder: (ctx) => AlertDialog(
+        backgroundColor: AppColors.card,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        title: Row(
+          children: [
+            const Icon(Icons.info_outline, color: AppColors.cyan, size: 22),
+            const SizedBox(width: 8),
+            Text(
+              strings.activeMeetingOngoingTitle,
+              style: const TextStyle(color: AppColors.text, fontSize: 17, fontWeight: FontWeight.w700),
+            ),
+          ],
+        ),
+        content: Text(
+          strings.activeMeetingOngoingDesc(meetingCode),
+          style: const TextStyle(color: AppColors.textSecondary, fontSize: 14, height: 1.4),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(ctx).pop(),
+            child: Text(strings.cancel, style: const TextStyle(color: AppColors.textDim)),
+          ),
+          OutlinedButton(
+            style: OutlinedButton.styleFrom(
+              side: const BorderSide(color: AppColors.danger),
+              foregroundColor: AppColors.danger,
+            ),
+            onPressed: () async {
+              Navigator.of(ctx).pop();
+              await _endActiveAndStartNew(meetingId);
+            },
+            child: Text(strings.endPreviousAndStartBtn),
+          ),
+          FilledButton(
+            style: FilledButton.styleFrom(backgroundColor: AppColors.primary),
+            onPressed: () async {
+              Navigator.of(ctx).pop();
+              await _rejoinMeeting(meetingCode);
+            },
+            child: Text(strings.rejoinMeetingBtn),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Future<void> _rejoinMeeting(String meetingCode) async {
+    setState(() {
+      _loading = true;
+      _error = null;
+    });
+    try {
+      final validation = await ApiService.instance.validateMeeting(meetingCode);
+      if (!validation.valid) {
+        if (mounted) setState(() => _error = validation.reason ?? context.strings.roomNotFound);
+        return;
+      }
+      final ticket = await ApiService.instance.joinAsGuest(meetingCode, widget.host.label);
+      if (!mounted) return;
+      await MeetingLauncher.enter(context, ticket: ticket, displayName: widget.host.label);
+    } catch (e) {
+      if (mounted) setState(() => _error = e.toString());
+    } finally {
+      if (mounted) setState(() => _loading = false);
+    }
+  }
+
+  Future<void> _endActiveAndStartNew(String activeMeetingId) async {
+    setState(() {
+      _loading = true;
+      _error = null;
+    });
+    try {
+      await ApiService.instance.endMeeting(activeMeetingId, userId: widget.host.id);
+      await _startMeeting();
+    } catch (e) {
+      if (mounted) setState(() => _error = 'Failed to end meeting: $e');
     } finally {
       if (mounted) setState(() => _loading = false);
     }

@@ -6,11 +6,13 @@ import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:image_picker/image_picker.dart';
-import 'package:url_launcher/url_launcher.dart';
+import 'package:open_filex/open_filex.dart';
 import 'package:web_socket_channel/web_socket_channel.dart';
 
 import '../config/env.dart';
+import '../l10n/app_strings.dart';
 import '../l10n/language_scope.dart';
+import '../services/meeting_file_downloader.dart';
 import '../theme/app_theme.dart';
 import '../widgets/common_widgets.dart';
 
@@ -86,6 +88,8 @@ class _MeetingChatSheetState extends State<MeetingChatSheet> {
   WebSocketChannel? _channel;
   StreamSubscription<dynamic>? _channelSub;
   bool _uploading = false;
+  final Map<String, String> _localFilePaths = {};
+  final Map<String, double> _downloadProgress = {};
 
   @override
   void initState() {
@@ -219,10 +223,179 @@ class _MeetingChatSheetState extends State<MeetingChatSheet> {
     }
   }
 
-  void _openUrl(String? url) {
+  Future<void> _handleDownloadAndOpen(MeetingChatMessage msg, {bool openImmediately = false}) async {
+    final url = msg.url;
     if (url == null || url.isEmpty) return;
     final fullUrl = url.startsWith('/') ? '${Env.webOrigin}$url' : url;
-    launchUrl(Uri.parse(fullUrl), mode: LaunchMode.externalApplication);
+    final filename = msg.name ?? (msg.type == 'image' ? 'image_${msg.id}.jpg' : 'file_${msg.id}');
+
+    try {
+      String localPath = _localFilePaths[msg.id] ?? '';
+      if (localPath.isEmpty || !MeetingFileDownloader.instance.isFileDownloaded(localPath)) {
+        localPath = await MeetingFileDownloader.instance.resolveLocalPath(filename);
+      }
+
+      if (MeetingFileDownloader.instance.isFileDownloaded(localPath)) {
+        _localFilePaths[msg.id] = localPath;
+        if (openImmediately) {
+          final res = await MeetingFileDownloader.instance.openFile(localPath);
+          if (res.type != ResultType.done && mounted) {
+            showErrorSnack(context, res.message);
+          }
+        } else {
+          if (mounted) {
+            showSuccessSnack(context, '${context.strings.fileSavedNotice}: $filename');
+          }
+        }
+        return;
+      }
+
+      setState(() => _downloadProgress[msg.id] = 0.05);
+
+      await MeetingFileDownloader.instance.downloadFile(
+        url: fullUrl,
+        localPath: localPath,
+        onProgress: (p) {
+          if (mounted) setState(() => _downloadProgress[msg.id] = p);
+        },
+      );
+
+      if (mounted) {
+        setState(() {
+          _localFilePaths[msg.id] = localPath;
+          _downloadProgress.remove(msg.id);
+        });
+        showSuccessSnack(context, '${context.strings.fileSavedNotice}: $filename');
+      }
+
+      if (openImmediately) {
+        final res = await MeetingFileDownloader.instance.openFile(localPath);
+        if (res.type != ResultType.done && mounted) {
+          showErrorSnack(context, res.message);
+        }
+      }
+    } catch (e) {
+      if (mounted) {
+        setState(() => _downloadProgress.remove(msg.id));
+        showErrorSnack(context, 'Download error: $e');
+      }
+    }
+  }
+
+  void _showImageViewerDialog(MeetingChatMessage msg) {
+    final url = msg.url;
+    if (url == null || url.isEmpty) return;
+    final imgUrl = url.startsWith('/') ? '${Env.webOrigin}$url' : url;
+    final strings = context.strings;
+
+    showDialog<void>(
+      context: context,
+      barrierColor: Colors.black.withValues(alpha: 0.95),
+      builder: (dialogCtx) => StatefulBuilder(
+        builder: (context, setDialogState) {
+          final localPath = _localFilePaths[msg.id];
+          final isDownloaded = localPath != null && MeetingFileDownloader.instance.isFileDownloaded(localPath);
+          final progress = _downloadProgress[msg.id];
+          final isDownloading = progress != null;
+
+          return Scaffold(
+            backgroundColor: Colors.transparent,
+            body: SafeArea(
+              child: Stack(
+                children: [
+                  Center(
+                    child: InteractiveViewer(
+                      minScale: 0.8,
+                      maxScale: 4.0,
+                      child: Image.network(
+                        imgUrl,
+                        fit: BoxFit.contain,
+                        loadingBuilder: (_, child, prog) {
+                          if (prog == null) return child;
+                          return const Center(child: CircularProgressIndicator(color: AppColors.cyan));
+                        },
+                        errorBuilder: (_, __, ___) => const Icon(Icons.broken_image, color: Colors.white54, size: 48),
+                      ),
+                    ),
+                  ),
+                  Positioned(
+                    top: 0,
+                    left: 0,
+                    right: 0,
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                      color: Colors.black.withValues(alpha: 0.6),
+                      child: Row(
+                        children: [
+                          Text(
+                            msg.displayName,
+                            style: const TextStyle(color: Colors.white, fontSize: 15, fontWeight: FontWeight.w700),
+                          ),
+                          const Spacer(),
+                          IconButton(
+                            icon: const Icon(Icons.close, color: Colors.white, size: 24),
+                            onPressed: () => Navigator.of(dialogCtx).pop(),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                  Positioned(
+                    bottom: 0,
+                    left: 0,
+                    right: 0,
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
+                      color: Colors.black.withValues(alpha: 0.7),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                        children: [
+                          FilledButton.icon(
+                            style: FilledButton.styleFrom(
+                              backgroundColor: isDownloaded ? Colors.white.withValues(alpha: 0.15) : AppColors.primary,
+                              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                            ),
+                            onPressed: isDownloading
+                                ? null
+                                : () async {
+                                    await _handleDownloadAndOpen(msg, openImmediately: false);
+                                    setDialogState(() {});
+                                  },
+                            icon: isDownloading
+                                ? const SizedBox(width: 16, height: 16, child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white))
+                                : Icon(isDownloaded ? Icons.check_circle_outline : Icons.download_rounded, size: 18),
+                            label: Text(
+                              isDownloaded
+                                  ? strings.downloaded
+                                  : isDownloading
+                                      ? strings.downloading
+                                      : strings.downloadFile,
+                            ),
+                          ),
+                          OutlinedButton.icon(
+                            style: OutlinedButton.styleFrom(
+                              foregroundColor: Colors.white,
+                              side: const BorderSide(color: AppColors.cardBorder),
+                              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                            ),
+                            onPressed: () async {
+                              await _handleDownloadAndOpen(msg, openImmediately: true);
+                              setDialogState(() {});
+                            },
+                            icon: const Icon(Icons.photo_library_outlined, size: 18, color: AppColors.cyan),
+                            label: Text(strings.openInGallery),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          );
+        },
+      ),
+    );
   }
 
   String _formatSize(int? bytes) {
@@ -331,12 +504,22 @@ class _MeetingChatSheetState extends State<MeetingChatSheet> {
                       itemBuilder: (context, index) {
                         final msg = _messages[index];
                         final isMe = msg.userId == widget.userId;
+                        final localPath = _localFilePaths[msg.id];
+                        final isDownloaded = localPath != null &&
+                            MeetingFileDownloader.instance.isFileDownloaded(localPath);
+                        final progress = _downloadProgress[msg.id];
+
                         return _MessageBubble(
                           message: msg,
                           isMe: isMe,
                           timeStr: _formatTime(msg.at),
                           formattedSize: _formatSize(msg.size),
-                          onTapMedia: () => _openUrl(msg.url),
+                          isDownloaded: isDownloaded,
+                          downloadProgress: progress,
+                          onTapImage: () => _showImageViewerDialog(msg),
+                          onTapFile: () => _handleDownloadAndOpen(msg, openImmediately: true),
+                          onDownloadFile: () => _handleDownloadAndOpen(msg, openImmediately: false),
+                          strings: strings,
                         );
                       },
                     ),
@@ -440,14 +623,24 @@ class _MessageBubble extends StatelessWidget {
     required this.isMe,
     required this.timeStr,
     required this.formattedSize,
-    required this.onTapMedia,
+    required this.isDownloaded,
+    required this.downloadProgress,
+    required this.onTapImage,
+    required this.onTapFile,
+    required this.onDownloadFile,
+    required this.strings,
   });
 
   final MeetingChatMessage message;
   final bool isMe;
   final String timeStr;
   final String formattedSize;
-  final VoidCallback onTapMedia;
+  final bool isDownloaded;
+  final double? downloadProgress;
+  final VoidCallback onTapImage;
+  final VoidCallback onTapFile;
+  final VoidCallback onDownloadFile;
+  final AppStrings strings;
 
   @override
   Widget build(BuildContext context) {
@@ -523,75 +716,154 @@ class _MessageBubble extends StatelessWidget {
   Widget _buildContent(BuildContext context) {
     if (message.type == 'image' && message.url != null) {
       final imgUrl = message.url!.startsWith('/') ? '${Env.webOrigin}${message.url}' : message.url!;
-      return InkWell(
-        onTap: onTapMedia,
-        child: ClipRRect(
-          borderRadius: BorderRadius.circular(10),
-          child: Image.network(
-            imgUrl,
-            width: 180,
-            fit: BoxFit.cover,
-            loadingBuilder: (ctx, child, progress) {
-              if (progress == null) return child;
-              return Container(
-                width: 160,
-                height: 100,
-                color: AppColors.cardBorder.withValues(alpha: 0.3),
-                alignment: Alignment.center,
-                child: const SizedBox(
-                  width: 20,
-                  height: 20,
-                  child: CircularProgressIndicator(strokeWidth: 2, color: AppColors.cyan),
+      final isDownloading = downloadProgress != null;
+
+      return Stack(
+        children: [
+          InkWell(
+            borderRadius: BorderRadius.circular(10),
+            onTap: onTapImage,
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(10),
+              child: Image.network(
+                imgUrl,
+                width: 180,
+                fit: BoxFit.cover,
+                loadingBuilder: (ctx, child, progress) {
+                  if (progress == null) return child;
+                  return Container(
+                    width: 160,
+                    height: 100,
+                    color: AppColors.cardBorder.withValues(alpha: 0.3),
+                    alignment: Alignment.center,
+                    child: const SizedBox(
+                      width: 20,
+                      height: 20,
+                      child: CircularProgressIndicator(strokeWidth: 2, color: AppColors.cyan),
+                    ),
+                  );
+                },
+                errorBuilder: (_, __, ___) => Container(
+                  width: 160,
+                  height: 100,
+                  color: AppColors.cardBorder,
+                  alignment: Alignment.center,
+                  child: const Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Icon(Icons.broken_image, color: AppColors.textDim, size: 24),
+                      SizedBox(height: 4),
+                      Text('Image unavailable', style: TextStyle(color: AppColors.textDim, fontSize: 10)),
+                    ],
+                  ),
                 ),
-              );
-            },
-            errorBuilder: (_, __, ___) => Container(
-              width: 160,
-              height: 100,
-              color: AppColors.cardBorder,
-              alignment: Alignment.center,
-              child: const Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Icon(Icons.broken_image, color: AppColors.textDim, size: 24),
-                  SizedBox(height: 4),
-                  Text('Image unavailable', style: TextStyle(color: AppColors.textDim, fontSize: 10)),
-                ],
               ),
             ),
           ),
-        ),
+          Positioned(
+            right: 6,
+            bottom: 6,
+            child: InkWell(
+              onTap: isDownloading ? null : onDownloadFile,
+              borderRadius: BorderRadius.circular(12),
+              child: Container(
+                padding: const EdgeInsets.all(4),
+                decoration: BoxDecoration(
+                  color: Colors.black.withValues(alpha: 0.7),
+                  shape: BoxShape.circle,
+                ),
+                child: isDownloading
+                    ? const SizedBox(
+                        width: 14,
+                        height: 14,
+                        child: CircularProgressIndicator(strokeWidth: 1.5, color: AppColors.cyan),
+                      )
+                    : Icon(
+                        isDownloaded ? Icons.check_circle : Icons.download_rounded,
+                        size: 14,
+                        color: isDownloaded ? AppColors.cyan : Colors.white,
+                      ),
+              ),
+            ),
+          ),
+        ],
       );
     }
 
     if (message.type == 'file' && message.url != null) {
+      final isDownloading = downloadProgress != null;
+
       return InkWell(
-        onTap: onTapMedia,
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            const Icon(Icons.insert_drive_file, size: 26, color: AppColors.cyan),
-            const SizedBox(width: 10),
-            ConstrainedBox(
-              constraints: const BoxConstraints(maxWidth: 180),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    message.name ?? 'Document',
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                    style: const TextStyle(color: AppColors.text, fontSize: 13, fontWeight: FontWeight.w600),
-                  ),
-                  if (formattedSize.isNotEmpty)
-                    Text(
-                      formattedSize,
-                      style: const TextStyle(color: AppColors.textSecondary, fontSize: 11),
-                    ),
-                ],
+        onTap: onTapFile,
+        borderRadius: BorderRadius.circular(8),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(vertical: 2),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Container(
+                padding: const EdgeInsets.all(8),
+                decoration: BoxDecoration(
+                  color: AppColors.cyan.withValues(alpha: 0.15),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: const Icon(Icons.insert_drive_file, size: 22, color: AppColors.cyan),
               ),
-            ),
-          ],
+              const SizedBox(width: 10),
+              ConstrainedBox(
+                constraints: const BoxConstraints(maxWidth: 160),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      message.name ?? 'Document',
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: const TextStyle(color: AppColors.text, fontSize: 13, fontWeight: FontWeight.w600),
+                    ),
+                    const SizedBox(height: 2),
+                    Row(
+                      children: [
+                        if (formattedSize.isNotEmpty)
+                          Text(
+                            formattedSize,
+                            style: const TextStyle(color: AppColors.textSecondary, fontSize: 11),
+                          ),
+                        if (formattedSize.isNotEmpty) const SizedBox(width: 6),
+                        Text(
+                          isDownloaded ? strings.openFile : strings.downloadFile,
+                          style: TextStyle(
+                            color: isDownloaded ? AppColors.cyan : AppColors.primaryLight,
+                            fontSize: 10,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(width: 8),
+              InkWell(
+                onTap: isDownloading ? null : onDownloadFile,
+                borderRadius: BorderRadius.circular(16),
+                child: Padding(
+                  padding: const EdgeInsets.all(4),
+                  child: isDownloading
+                      ? const SizedBox(
+                          width: 18,
+                          height: 18,
+                          child: CircularProgressIndicator(strokeWidth: 2, color: AppColors.cyan),
+                        )
+                      : Icon(
+                          isDownloaded ? Icons.file_open_rounded : Icons.download_rounded,
+                          size: 20,
+                          color: isDownloaded ? AppColors.cyan : Colors.white70,
+                        ),
+                ),
+              ),
+            ],
+          ),
         ),
       );
     }

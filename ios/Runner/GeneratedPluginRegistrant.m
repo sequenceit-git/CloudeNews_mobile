@@ -24,6 +24,12 @@
 @import image_picker_ios;
 #endif
 
+#if __has_include(<open_filex/OpenFilePlugin.h>)
+#import <open_filex/OpenFilePlugin.h>
+#else
+@import open_filex;
+#endif
+
 #if __has_include(<permission_handler_apple/PermissionHandlerPlugin.h>)
 #import <permission_handler_apple/PermissionHandlerPlugin.h>
 #else
@@ -54,6 +60,7 @@
   [AppLinksIosPlugin registerWithRegistrar:[registry registrarForPlugin:@"AppLinksIosPlugin"]];
   [FilePickerPlugin registerWithRegistrar:[registry registrarForPlugin:@"FilePickerPlugin"]];
   [ImagePickerPlugin registerWithRegistrar:[registry registrarForPlugin:@"ImagePickerPlugin"]];
+  [OpenFilePlugin registerWithRegistrar:[registry registrarForPlugin:@"OpenFilePlugin"]];
   [PermissionHandlerPlugin registerWithRegistrar:[registry registrarForPlugin:@"PermissionHandlerPlugin"]];
   [SuperPlayerPlugin registerWithRegistrar:[registry registrarForPlugin:@"SuperPlayerPlugin"]];
   [TencentRTCCloud registerWithRegistrar:[registry registrarForPlugin:@"TencentRTCCloud"]];
