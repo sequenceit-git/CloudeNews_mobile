@@ -2,7 +2,7 @@ name: cloud_news_app
 description: "CloudNews - multi-party video meetings powered by Tencent TRTC."
 publish_to: 'none'
 
-version: 2.0.0+2
+version: 3.0.0+3
 
 environment:
   sdk: ^3.7.0
