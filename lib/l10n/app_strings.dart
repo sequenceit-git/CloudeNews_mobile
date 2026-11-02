@@ -72,6 +72,9 @@ class AppStrings {
   final String startScreenShare;
   final String stopScreenShare;
   final String screenShareActive;
+  final String confirmStartScreenShareTitle;
+  final String confirmStartScreenShareDesc;
+  final String startSharingAction;
   final String Function(String name) otherUserSharingScreen;
   final String leaveMeeting;
   final String endMeetingForAll;
@@ -167,6 +170,9 @@ class AppStrings {
     required this.startScreenShare,
     required this.stopScreenShare,
     required this.screenShareActive,
+    required this.confirmStartScreenShareTitle,
+    required this.confirmStartScreenShareDesc,
+    required this.startSharingAction,
     required this.otherUserSharingScreen,
     required this.leaveMeeting,
     required this.endMeetingForAll,
@@ -262,6 +268,9 @@ class AppStrings {
     startScreenShare: 'Share Screen',
     stopScreenShare: 'Stop Share',
     screenShareActive: 'Sharing Screen',
+    confirmStartScreenShareTitle: 'Start Screen Sharing?',
+    confirmStartScreenShareDesc: 'Everyone in this meeting will be able to see your screen.',
+    startSharingAction: 'Start Sharing',
     otherUserSharingScreen: (name) => '$name is currently sharing the screen.',
     leaveMeeting: 'Leave Meeting',
     endMeetingForAll: 'End Meeting for All',
@@ -355,6 +364,9 @@ class AppStrings {
     startScreenShare: '共享屏幕',
     stopScreenShare: '停止共享',
     screenShareActive: '正在共享屏幕',
+    confirmStartScreenShareTitle: '开始屏幕共享？',
+    confirmStartScreenShareDesc: '会议中的所有人都能看到您的屏幕内容。',
+    startSharingAction: '开始共享',
     otherUserSharingScreen: (name) => '$name 目前正在共享屏幕',
     leaveMeeting: '离开会议',
     endMeetingForAll: '结束全体会议',

@@ -54,6 +54,7 @@ class _MeetingRoomScreenState extends State<MeetingRoomScreen> {
   bool _isFrontCamera = true;
   bool _isSpeakerPhone = true;
   bool _isSharingScreen = false;
+  bool _isStartingScreenShare = false;
   bool _wasCameraOnBeforeScreenShare = false;
   bool _isChatOpen = false;
   bool _isScreenShareFit = true;
@@ -590,6 +591,12 @@ class _MeetingRoomScreenState extends State<MeetingRoomScreen> {
       return;
     }
 
+    _confirmAndStartScreenShare();
+  }
+
+  Future<void> _confirmAndStartScreenShare() async {
+    if (_isStartingScreenShare) return;
+
     // Check if another participant is currently sharing the screen
     final myCleanId = widget.ticket.trtc.userId.replaceAll('-', '');
     final remoteSubStreamUsers = _subStreamUsers.where((uid) => uid.replaceAll('-', '') != myCleanId).toList();
@@ -607,6 +614,100 @@ class _MeetingRoomScreenState extends State<MeetingRoomScreen> {
       showWarningSnack(context, context.strings.otherUserSharingScreen(activeSharerName));
       return;
     }
+
+    final strings = context.strings;
+    final confirmed = await showModalBottomSheet<bool>(
+      context: context,
+      backgroundColor: Colors.transparent,
+      builder: (sheetContext) => Container(
+        padding: const EdgeInsets.fromLTRB(20, 16, 20, 24),
+        decoration: const BoxDecoration(
+          color: AppColors.card,
+          borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+        ),
+        child: SafeArea(
+          top: false,
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Container(
+                width: 36,
+                height: 4,
+                margin: const EdgeInsets.only(bottom: 16),
+                decoration: BoxDecoration(
+                  color: AppColors.textDim.withValues(alpha: 0.4),
+                  borderRadius: BorderRadius.circular(2),
+                ),
+              ),
+              Container(
+                padding: const EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  color: AppColors.cyan.withValues(alpha: 0.15),
+                  shape: BoxShape.circle,
+                ),
+                child: const Icon(Icons.screen_share, size: 36, color: AppColors.cyan),
+              ),
+              const SizedBox(height: 16),
+              Text(
+                strings.confirmStartScreenShareTitle,
+                style: const TextStyle(color: AppColors.text, fontSize: 17, fontWeight: FontWeight.bold),
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: 8),
+              Text(
+                strings.confirmStartScreenShareDesc,
+                style: const TextStyle(color: AppColors.textSecondary, fontSize: 13, height: 1.4),
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: 24),
+              Row(
+                children: [
+                  Expanded(
+                    child: OutlinedButton(
+                      style: OutlinedButton.styleFrom(
+                        foregroundColor: AppColors.text,
+                        side: const BorderSide(color: AppColors.cardBorder),
+                        padding: const EdgeInsets.symmetric(vertical: 13),
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                      ),
+                      onPressed: () => Navigator.of(sheetContext).pop(false),
+                      child: Text(strings.cancel),
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: FilledButton(
+                      style: FilledButton.styleFrom(
+                        backgroundColor: AppColors.cyan,
+                        foregroundColor: Colors.black,
+                        padding: const EdgeInsets.symmetric(vertical: 13),
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                      ),
+                      onPressed: () => Navigator.of(sheetContext).pop(true),
+                      child: Text(strings.startSharingAction, style: const TextStyle(fontWeight: FontWeight.w700)),
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+
+    if (confirmed != true || !mounted) return;
+
+    _startScreenShareCapture();
+  }
+
+  void _startScreenShareCapture() {
+    if (_isStartingScreenShare) return;
+    _isStartingScreenShare = true;
+
+    // Cooldown debouncer
+    Future.delayed(const Duration(milliseconds: 1500), () {
+      if (mounted) _isStartingScreenShare = false;
+    });
 
     // Seamlessly pause camera preview while sharing screen to avoid OS hardware contention
     if (!_isCameraOff) {
@@ -628,15 +729,7 @@ class _MeetingRoomScreenState extends State<MeetingRoomScreen> {
         _trtcCloud?.startScreenCapture(0, TRTCVideoStreamType.sub, encParams);
       }
       _trtcCloud?.setSubStreamEncoderParam(encParams);
-      _broadcastTrtcCommand({
-        'action': 'screen_share_started',
-        'sharerId': widget.ticket.trtc.userId,
-        'sharerName': widget.displayName,
-      });
-      setState(() => _isSharingScreen = true);
-      if (_carouselController.hasClients && _currentCarouselPage != 0) {
-        _carouselController.animateToPage(0, duration: const Duration(milliseconds: 300), curve: Curves.easeInOut);
-      }
+      // Note: _isSharingScreen will be set to true when onScreenCaptureStarted fires
     } catch (e) {
       debugPrint('[TRTC] startScreenCapture error: $e');
       if (mounted) showErrorSnack(context, 'Screen share error: $e');

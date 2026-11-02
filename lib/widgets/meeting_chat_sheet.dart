@@ -347,45 +347,32 @@ class _MeetingChatSheetState extends State<MeetingChatSheet> {
                     child: Container(
                       padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
                       color: Colors.black.withValues(alpha: 0.7),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                        children: [
-                          FilledButton.icon(
-                            style: FilledButton.styleFrom(
-                              backgroundColor: isDownloaded ? Colors.white.withValues(alpha: 0.15) : AppColors.primary,
-                              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-                            ),
-                            onPressed: isDownloading
-                                ? null
-                                : () async {
-                                    await _handleDownloadAndOpen(msg, openImmediately: false);
-                                    setDialogState(() {});
-                                  },
-                            icon: isDownloading
-                                ? const SizedBox(width: 16, height: 16, child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white))
-                                : Icon(isDownloaded ? Icons.check_circle_outline : Icons.download_rounded, size: 18),
-                            label: Text(
-                              isDownloaded
-                                  ? strings.downloaded
-                                  : isDownloading
-                                      ? strings.downloading
-                                      : strings.downloadFile,
-                            ),
+                      child: Center(
+                        child: FilledButton.icon(
+                          style: FilledButton.styleFrom(
+                            backgroundColor: isDownloaded ? AppColors.cyan.withValues(alpha: 0.2) : AppColors.primary,
+                            foregroundColor: isDownloaded ? AppColors.cyan : Colors.white,
+                            padding: const EdgeInsets.symmetric(horizontal: 28, vertical: 12),
+                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                           ),
-                          OutlinedButton.icon(
-                            style: OutlinedButton.styleFrom(
-                              foregroundColor: Colors.white,
-                              side: const BorderSide(color: AppColors.cardBorder),
-                              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-                            ),
-                            onPressed: () async {
-                              await _handleDownloadAndOpen(msg, openImmediately: true);
-                              setDialogState(() {});
-                            },
-                            icon: const Icon(Icons.photo_library_outlined, size: 18, color: AppColors.cyan),
-                            label: Text(strings.openInGallery),
+                          onPressed: isDownloading
+                              ? null
+                              : () async {
+                                  await _handleDownloadAndOpen(msg, openImmediately: false);
+                                  setDialogState(() {});
+                                },
+                          icon: isDownloading
+                              ? const SizedBox(width: 16, height: 16, child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white))
+                              : Icon(isDownloaded ? Icons.check_circle_rounded : Icons.download_rounded, size: 20),
+                          label: Text(
+                            isDownloaded
+                                ? strings.downloaded
+                                : isDownloading
+                                    ? strings.downloading
+                                    : strings.downloadFile,
+                            style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 14),
                           ),
-                        ],
+                        ),
                       ),
                     ),
                   ),
@@ -517,7 +504,7 @@ class _MeetingChatSheetState extends State<MeetingChatSheet> {
                           isDownloaded: isDownloaded,
                           downloadProgress: progress,
                           onTapImage: () => _showImageViewerDialog(msg),
-                          onTapFile: () => _handleDownloadAndOpen(msg, openImmediately: true),
+                          onTapFile: () => _handleDownloadAndOpen(msg, openImmediately: false),
                           onDownloadFile: () => _handleDownloadAndOpen(msg, openImmediately: false),
                           strings: strings,
                         );
@@ -831,7 +818,7 @@ class _MessageBubble extends StatelessWidget {
                           ),
                         if (formattedSize.isNotEmpty) const SizedBox(width: 6),
                         Text(
-                          isDownloaded ? strings.openFile : strings.downloadFile,
+                          isDownloaded ? strings.downloaded : strings.downloadFile,
                           style: TextStyle(
                             color: isDownloaded ? AppColors.cyan : AppColors.primaryLight,
                             fontSize: 10,
@@ -856,7 +843,7 @@ class _MessageBubble extends StatelessWidget {
                           child: CircularProgressIndicator(strokeWidth: 2, color: AppColors.cyan),
                         )
                       : Icon(
-                          isDownloaded ? Icons.file_open_rounded : Icons.download_rounded,
+                          isDownloaded ? Icons.check_circle_rounded : Icons.download_rounded,
                           size: 20,
                           color: isDownloaded ? AppColors.cyan : Colors.white70,
                         ),

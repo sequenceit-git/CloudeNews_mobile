@@ -45,6 +45,8 @@
 	<string>CloudNews uses Bluetooth for audio accessories during meetings</string>
 	<key>NSCameraUsageDescription</key>
 	<string>CloudNews needs camera access for video meetings</string>
+	<key>NSLocationWhenInUseUsageDescription</key>
+	<string>CloudNews uses network location to optimize call routing and ensure low-latency connection quality during meetings.</string>
 	<key>NSMicrophoneUsageDescription</key>
 	<string>CloudNews needs microphone access for video meetings</string>
 	<key>NSPhotoLibraryAddUsageDescription</key>
