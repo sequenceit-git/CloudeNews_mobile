@@ -142,3 +142,4 @@ class MeetingTopBar extends StatelessWidget {
     );
   }
 }
+
