@@ -45,6 +45,7 @@ ios/Runner.xcodeproj/project.xcworkspace/xcuserdata/
 **/Icon?
 **/Pods/
 **/.symlinks/
+**/swiftpm/
 profile
 xcuserdata
 

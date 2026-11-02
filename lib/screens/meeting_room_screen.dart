@@ -7,7 +7,6 @@ import 'package:flutter/services.dart';
 import 'package:tencent_rtc_sdk/trtc_cloud.dart';
 import 'package:tencent_rtc_sdk/trtc_cloud_def.dart';
 import 'package:tencent_rtc_sdk/trtc_cloud_listener.dart';
-import 'package:tencent_rtc_sdk/trtc_cloud_video_view.dart';
 import 'package:tencent_rtc_sdk/tx_device_manager.dart';
 import 'package:web_socket_channel/web_socket_channel.dart';
 
@@ -19,6 +18,11 @@ import '../services/api_service.dart';
 import '../theme/app_theme.dart';
 import '../widgets/common_widgets.dart';
 import '../widgets/meeting_chat_sheet.dart';
+import '../widgets/meeting/meeting_bottom_bar.dart';
+import '../widgets/meeting/meeting_carousel_view.dart';
+import '../widgets/meeting/meeting_dialogs.dart';
+import '../widgets/meeting/meeting_top_bar.dart';
+import '../widgets/meeting/meeting_video_tile.dart';
 
 class MeetingRoomScreen extends StatefulWidget {
   const MeetingRoomScreen({
@@ -731,198 +735,40 @@ class _MeetingRoomScreenState extends State<MeetingRoomScreen> {
 
   void _showMembersList() {
     final strings = context.strings;
-    showModalBottomSheet<void>(
-      context: context,
-      backgroundColor: AppColors.card,
-      shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(20))),
-      builder: (context) {
-        final members = [
-          {
-            'name': '${widget.displayName} (${strings.meBadge})',
-            'isHost': _isHost,
-            'isMuted': _isMicMuted,
-          },
-          ..._remoteParticipants.map((id) {
-            final cleanId = id.replaceAll('-', '');
-            return {
-              'name': _getDisplayNameForUser(id),
-              'isHost': cleanId == _currentHostUserId,
-              'isMuted': !_audioAvailableUsers.contains(id),
-            };
-          }),
-        ];
-        return Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
-                children: [
-                  Text(
-                    '${strings.membersTitle} (${members.length})',
-                    style: const TextStyle(color: AppColors.text, fontSize: 16, fontWeight: FontWeight.w700),
-                  ),
-                  const Spacer(),
-                  IconButton(
-                    icon: const Icon(Icons.close, color: AppColors.textSecondary, size: 20),
-                    onPressed: () => Navigator.of(context).pop(),
-                  ),
-                ],
-              ),
-              const Divider(color: AppColors.cardBorder),
-              ...members.map((m) {
-                final isMuted = m['isMuted'] == true;
-                return Padding(
-                  padding: const EdgeInsets.symmetric(vertical: 8),
-                  child: Row(
-                    children: [
-                      CircleAvatar(
-                        radius: 16,
-                        backgroundColor: AppColors.primary.withValues(alpha: 0.2),
-                        child: Text(
-                          (m['name'] as String).characters.first.toUpperCase(),
-                          style: const TextStyle(color: AppColors.primaryLight, fontSize: 12, fontWeight: FontWeight.w700),
-                        ),
-                      ),
-                      const SizedBox(width: 12),
-                      Expanded(
-                        child: Row(
-                          children: [
-                            Flexible(
-                              child: Text(
-                                m['name'] as String,
-                                maxLines: 1,
-                                overflow: TextOverflow.ellipsis,
-                                style: const TextStyle(color: AppColors.text, fontSize: 14),
-                              ),
-                            ),
-                            if (m['isHost'] == true) ...[
-                              const SizedBox(width: 8),
-                              Container(
-                                padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                                decoration: BoxDecoration(
-                                  color: AppColors.primary.withValues(alpha: 0.2),
-                                  borderRadius: BorderRadius.circular(4),
-                                ),
-                                child: Text(
-                                  strings.hostBadge,
-                                  style: const TextStyle(color: AppColors.primaryLight, fontSize: 10, fontWeight: FontWeight.w600),
-                                ),
-                              ),
-                            ],
-                          ],
-                        ),
-                      ),
-                      Icon(
-                        isMuted ? Icons.mic_off : Icons.mic,
-                        size: 18,
-                        color: isMuted ? AppColors.danger : AppColors.cyan,
-                      ),
-                    ],
-                  ),
-                );
-              }),
-            ],
-          ),
+    final members = [
+      MeetingMemberItem(
+        name: '${widget.displayName} (${strings.meBadge})',
+        isHost: _isHost,
+        isMuted: _isMicMuted,
+      ),
+      ..._remoteParticipants.map((id) {
+        final cleanId = id.replaceAll('-', '');
+        return MeetingMemberItem(
+          name: _getDisplayNameForUser(id),
+          isHost: cleanId == _currentHostUserId,
+          isMuted: !_audioAvailableUsers.contains(id),
         );
-      },
+      }),
+    ];
+
+    showMeetingMembersSheet(
+      context: context,
+      members: members,
+      strings: strings,
     );
   }
 
   void _promptLeaveOrEnd() {
     final strings = context.strings;
-
-    if (!_isHost) {
-      // Guest only has a single option: Leave Meeting
-      showDialog<void>(
-        context: context,
-        builder: (ctx) => AlertDialog(
-          backgroundColor: AppColors.card,
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-          title: Text(strings.leaveMeeting, style: const TextStyle(color: AppColors.text, fontWeight: FontWeight.w700)),
-          content: Text(strings.confirmLeave, style: const TextStyle(color: AppColors.textSecondary)),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.of(ctx).pop(),
-              child: Text(strings.cancel, style: const TextStyle(color: AppColors.textDim)),
-            ),
-            FilledButton(
-              style: FilledButton.styleFrom(backgroundColor: AppColors.danger),
-              onPressed: () {
-                Navigator.of(ctx).pop();
-                _exitAndNotify(isHostEnding: false);
-              },
-              child: Text(strings.leaveMeeting),
-            ),
-          ],
-        ),
-      );
-      return;
-    }
-
-    // Host has 2 options: End Meeting for All OR Leave Meeting (with Host Transfer)
-    showModalBottomSheet<void>(
+    showLeaveOrEndMeetingDialog(
       context: context,
-      backgroundColor: AppColors.card,
-      shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(20))),
-      builder: (ctx) => SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Container(
-                width: 36,
-                height: 4,
-                margin: const EdgeInsets.only(bottom: 16),
-                decoration: BoxDecoration(color: Colors.white.withValues(alpha: 0.2), borderRadius: BorderRadius.circular(2)),
-              ),
-              // Option 1: End Meeting for All
-              SizedBox(
-                width: double.infinity,
-                child: FilledButton(
-                  style: FilledButton.styleFrom(
-                    backgroundColor: AppColors.danger,
-                    padding: const EdgeInsets.symmetric(vertical: 14),
-                  ),
-                  onPressed: () {
-                    Navigator.of(ctx).pop();
-                    _endMeetingForAll();
-                  },
-                  child: Text(strings.endMeetingForAll, style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w700)),
-                ),
-              ),
-              const SizedBox(height: 10),
-              // Option 2: Leave Meeting
-              SizedBox(
-                width: double.infinity,
-                child: OutlinedButton(
-                  style: OutlinedButton.styleFrom(
-                    foregroundColor: AppColors.text,
-                    side: const BorderSide(color: AppColors.cardBorder),
-                    padding: const EdgeInsets.symmetric(vertical: 14),
-                  ),
-                  onPressed: () {
-                    Navigator.of(ctx).pop();
-                    if (_remoteParticipants.isEmpty) {
-                      _confirmAloneLeave(strings);
-                    } else {
-                      _showHostTransferSheet(strings);
-                    }
-                  },
-                  child: Text(strings.leaveMeeting, style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w600)),
-                ),
-              ),
-              const SizedBox(height: 10),
-              TextButton(
-                onPressed: () => Navigator.of(ctx).pop(),
-                child: Text(strings.cancel, style: const TextStyle(color: AppColors.textDim)),
-              ),
-            ],
-          ),
-        ),
-      ),
+      isHost: _isHost,
+      hasRemoteParticipants: _remoteParticipants.isNotEmpty,
+      onGuestLeave: () => _exitAndNotify(isHostEnding: false),
+      onHostEndForAll: _endMeetingForAll,
+      onHostTransferAndLeave: () => _showHostTransferSheet(strings),
+      onHostAloneLeave: () => _confirmAloneLeave(strings),
+      strings: strings,
     );
   }
 
@@ -932,163 +778,36 @@ class _MeetingRoomScreenState extends State<MeetingRoomScreen> {
   }
 
   void _confirmAloneLeave(AppStrings strings) {
-    showDialog<void>(
+    showConfirmAloneLeaveDialog(
       context: context,
-      builder: (ctx) => AlertDialog(
-        backgroundColor: AppColors.card,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-        title: Text(strings.leaveMeeting, style: const TextStyle(color: AppColors.text, fontWeight: FontWeight.w700)),
-        content: Text(strings.aloneInMeeting, style: const TextStyle(color: AppColors.textSecondary)),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(ctx).pop(),
-            child: Text(strings.cancel, style: const TextStyle(color: AppColors.textDim)),
-          ),
-          FilledButton(
-            style: FilledButton.styleFrom(backgroundColor: AppColors.danger),
-            onPressed: () {
-              Navigator.of(ctx).pop();
-              _endMeetingForAll();
-            },
-            child: Text(strings.leaveAndEnd),
-          ),
-        ],
-      ),
+      onConfirmEnd: _endMeetingForAll,
+      strings: strings,
     );
   }
 
   void _showHostTransferSheet(AppStrings strings) {
-    String? selectedUserId = _remoteParticipants.firstOrNull;
-
-    showModalBottomSheet<void>(
+    showHostTransferSheet(
       context: context,
-      backgroundColor: AppColors.card,
-      isScrollControlled: true,
-      shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(20))),
-      builder: (ctx) => StatefulBuilder(
-        builder: (context, setModalState) {
-          final candidates = _remoteParticipants.toList();
-
-          return SafeArea(
-            child: Padding(
-              padding: const EdgeInsets.fromLTRB(20, 16, 20, 20),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Center(
-                    child: Container(
-                      width: 36,
-                      height: 4,
-                      margin: const EdgeInsets.only(bottom: 16),
-                      decoration: BoxDecoration(color: Colors.white.withValues(alpha: 0.2), borderRadius: BorderRadius.circular(2)),
-                    ),
-                  ),
-                  Text(
-                    strings.transferHostTitle,
-                    style: const TextStyle(color: AppColors.text, fontSize: 18, fontWeight: FontWeight.w700),
-                  ),
-                  const SizedBox(height: 6),
-                  Text(
-                    strings.transferHostSubtitle,
-                    style: const TextStyle(color: AppColors.textSecondary, fontSize: 13),
-                  ),
-                  const SizedBox(height: 16),
-                  ConstrainedBox(
-                    constraints: BoxConstraints(maxHeight: MediaQuery.sizeOf(context).height * 0.4),
-                    child: ListView.separated(
-                      shrinkWrap: true,
-                      itemCount: candidates.length,
-                      separatorBuilder: (_, __) => const Divider(color: AppColors.cardBorder, height: 1),
-                      itemBuilder: (context, index) {
-                        final uid = candidates[index];
-                        final name = _getDisplayNameForUser(uid);
-                        final initial = name.isNotEmpty ? name.characters.first.toUpperCase() : '?';
-                        final isSelected = selectedUserId == uid;
-
-                        return InkWell(
-                          onTap: () => setModalState(() => selectedUserId = uid),
-                          borderRadius: BorderRadius.circular(8),
-                          child: Padding(
-                            padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 8),
-                            child: Row(
-                              children: [
-                                CircleAvatar(
-                                  radius: 18,
-                                  backgroundColor: AppColors.primary.withValues(alpha: 0.2),
-                                  child: Text(
-                                    initial,
-                                    style: const TextStyle(color: AppColors.primaryLight, fontWeight: FontWeight.bold),
-                                  ),
-                                ),
-                                const SizedBox(width: 12),
-                                Expanded(
-                                  child: Text(
-                                    name,
-                                    style: const TextStyle(color: AppColors.text, fontSize: 15, fontWeight: FontWeight.w600),
-                                  ),
-                                ),
-                                Icon(
-                                  isSelected ? Icons.check_circle : Icons.radio_button_unchecked,
-                                  color: isSelected ? AppColors.cyan : AppColors.textDim,
-                                  size: 22,
-                                ),
-                              ],
-                            ),
-                          ),
-                        );
-                      },
-                    ),
-                  ),
-                  const SizedBox(height: 20),
-                  SizedBox(
-                    width: double.infinity,
-                    child: FilledButton(
-                      style: FilledButton.styleFrom(
-                        backgroundColor: AppColors.primary,
-                        padding: const EdgeInsets.symmetric(vertical: 14),
-                        disabledBackgroundColor: AppColors.primary.withValues(alpha: 0.3),
-                      ),
-                      onPressed: selectedUserId == null
-                          ? null
-                          : () async {
-                              final targetId = selectedUserId!;
-                              Navigator.of(ctx).pop();
-                              try {
-                                await ApiService.instance.transferHost(
-                                  widget.ticket.meeting.id,
-                                  widget.ticket.trtc.userId,
-                                  targetId,
-                                );
-                                _broadcastTrtcCommand({
-                                  'action': 'transfer_host',
-                                  'newHostUserId': targetId,
-                                  'newHostName': _getDisplayNameForUser(targetId),
-                                });
-                                await _exitAndNotify(isHostEnding: false);
-                              } catch (e) {
-                                if (mounted) showErrorSnack(this.context, 'Transfer host error: $e');
-                              }
-                            },
-                      child: Text(
-                        strings.transferAndLeave,
-                        style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w700),
-                      ),
-                    ),
-                  ),
-                  const SizedBox(height: 10),
-                  Center(
-                    child: TextButton(
-                      onPressed: () => Navigator.of(ctx).pop(),
-                      child: Text(strings.cancel, style: const TextStyle(color: AppColors.textDim)),
-                    ),
-                  ),
-                ],
-              ),
-            ),
+      candidateUserIds: _remoteParticipants.toList(),
+      getDisplayName: _getDisplayNameForUser,
+      onTransferAndLeave: (targetId) async {
+        try {
+          await ApiService.instance.transferHost(
+            widget.ticket.meeting.id,
+            widget.ticket.trtc.userId,
+            targetId,
           );
-        },
-      ),
+          _broadcastTrtcCommand({
+            'action': 'transfer_host',
+            'newHostUserId': targetId,
+            'newHostName': _getDisplayNameForUser(targetId),
+          });
+          await _exitAndNotify(isHostEnding: false);
+        } catch (e) {
+          if (mounted) showErrorSnack(context, 'Transfer host error: $e');
+        }
+      },
+      strings: strings,
     );
   }
 
@@ -1137,6 +856,52 @@ class _MeetingRoomScreenState extends State<MeetingRoomScreen> {
   @override
   Widget build(BuildContext context) {
     final strings = context.strings;
+    final isSharing = _subStreamUsers.isNotEmpty || _isSharingScreen;
+    final sharerId = _subStreamUsers.isNotEmpty ? _subStreamUsers.first : null;
+
+    final myVol = _userVolumeMap[widget.ticket.trtc.userId] ?? 0;
+    final allMemberTiles = <Widget>[
+      MeetingLocalTile(
+        displayName: widget.displayName,
+        isHost: _isHost,
+        isMicMuted: _isMicMuted,
+        isCameraOff: _isCameraOff,
+        isChatOpen: _isChatOpen,
+        isExiting: _isExiting,
+        isSpeaking: myVol > 20,
+        onViewCreated: (viewId) {
+          _localViewId = viewId;
+          if (_trtcCloud != null) {
+            _trtcCloud?.startLocalPreview(_isFrontCamera, viewId);
+            _trtcCloud?.muteLocalVideo(TRTCVideoStreamType.big, false);
+          }
+        },
+        strings: strings,
+      ),
+      ..._remoteParticipants.map((uid) {
+        final hasVideo = _videoAvailableUsers.contains(uid);
+        final isRemoteMicMuted = !_audioAvailableUsers.contains(uid);
+        final vol = _userVolumeMap[uid] ?? 0;
+        final cleanRemote = uid.replaceAll('-', '');
+        final isRemoteHost = cleanRemote == _currentHostUserId;
+
+        return MeetingRemoteTile(
+          userId: uid,
+          displayName: _getDisplayNameForUser(uid),
+          isHost: isRemoteHost,
+          isRemoteMicMuted: isRemoteMicMuted,
+          hasVideo: hasVideo,
+          isChatOpen: _isChatOpen,
+          isExiting: _isExiting,
+          isSpeaking: vol > 20,
+          onViewCreated: (viewId) {
+            _remoteUserViews[uid] = viewId;
+            _trtcCloud?.startRemoteView(uid, TRTCVideoStreamType.big, viewId);
+          },
+          strings: strings,
+        );
+      }),
+    ];
 
     return PopScope(
       canPop: false,
@@ -1148,603 +913,76 @@ class _MeetingRoomScreenState extends State<MeetingRoomScreen> {
         body: SafeArea(
           child: Column(
             children: [
-              // Top Bar (Fixed at top, never covering screen share)
-              _buildTopBar(strings),
-              // Main Video or Screen Share Carousel with dynamic page indicator
-              Expanded(
-                child: _buildCarouselBody(),
+              MeetingTopBar(
+                meetingCode: widget.ticket.meeting.meetingCode,
+                elapsedFormatted: _formatElapsed(),
+                isSpeakerPhone: _isSpeakerPhone,
+                isCameraOff: _isCameraOff,
+                hasSubstream: _subStreamUsers.isNotEmpty,
+                isScreenShareFit: _isScreenShareFit,
+                onCopyMeetingCode: _copyMeetingCode,
+                onToggleAudioRoute: _toggleAudioRoute,
+                onFlipCamera: _flipCamera,
+                onToggleScreenShareFit: () {
+                  final sId = _subStreamUsers.first;
+                  setState(() {
+                    _isScreenShareFit = !_isScreenShareFit;
+                    _trtcCloud?.setRemoteRenderParams(
+                      sId,
+                      TRTCVideoStreamType.sub,
+                      TRTCRenderParams(
+                        fillMode: _isScreenShareFit ? TRTCVideoFillMode.fit : TRTCVideoFillMode.fill,
+                        rotation: TRTCVideoRotation.rotation0,
+                      ),
+                    );
+                  });
+                },
+                onPromptLeaveOrEnd: _promptLeaveOrEnd,
+                strings: strings,
               ),
-              // Bottom Controls (Fixed at bottom, never covering screen share)
-              _buildBottomControls(strings),
+              Expanded(
+                child: MeetingCarouselView(
+                  controller: _carouselController,
+                  currentPage: _currentCarouselPage,
+                  onPageChanged: (page) => setState(() => _currentCarouselPage = page),
+                  isSharing: isSharing,
+                  sharerId: sharerId,
+                  isExiting: _isExiting,
+                  isScreenShareFit: _isScreenShareFit,
+                  onSubstreamViewCreated: (viewId) {
+                    if (sharerId != null) {
+                      _trtcCloud?.startRemoteView(sharerId, TRTCVideoStreamType.sub, viewId);
+                      _trtcCloud?.setRemoteRenderParams(
+                        sharerId,
+                        TRTCVideoStreamType.sub,
+                        TRTCRenderParams(
+                          fillMode: _isScreenShareFit ? TRTCVideoFillMode.fit : TRTCVideoFillMode.fill,
+                          rotation: TRTCVideoRotation.rotation0,
+                        ),
+                      );
+                    }
+                  },
+                  onStopScreenShare: _toggleScreenShare,
+                  participantTiles: allMemberTiles,
+                  strings: strings,
+                ),
+              ),
+              MeetingBottomBar(
+                isMicMuted: _isMicMuted,
+                isCameraOff: _isCameraOff,
+                isSharingScreen: _isSharingScreen,
+                hasUnreadChat: _unreadChatCount > 0,
+                unreadChatCount: _unreadChatCount,
+                participantCount: _remoteParticipants.length + 1,
+                onToggleMic: _toggleMic,
+                onToggleCamera: _toggleCamera,
+                onToggleScreenShare: _toggleScreenShare,
+                onOpenChat: _openChatSheet,
+                onShowMembers: _showMembersList,
+                strings: strings,
+              ),
             ],
           ),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildTopBar(AppStrings strings) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-      color: Colors.black.withValues(alpha: 0.8),
-      child: Row(
-        children: [
-          // Connection status indicator
-          Container(
-            width: 8,
-            height: 8,
-            margin: const EdgeInsets.only(right: 8),
-            decoration: BoxDecoration(
-              color: _isInRoom ? const Color(0xFF10B981) : const Color(0xFFF59E0B),
-              shape: BoxShape.circle,
-            ),
-          ),
-          // Elapsed time
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-            decoration: BoxDecoration(
-              color: Colors.white.withValues(alpha: 0.1),
-              borderRadius: BorderRadius.circular(6),
-            ),
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                const Icon(Icons.timer_outlined, size: 13, color: AppColors.cyan),
-                const SizedBox(width: 4),
-                Text(
-                  _formatElapsed(),
-                  style: const TextStyle(color: AppColors.text, fontSize: 12, fontWeight: FontWeight.w600, fontFamily: 'monospace'),
-                ),
-              ],
-            ),
-          ),
-          const SizedBox(width: 10),
-          // Meeting code (1-tap copy)
-          InkWell(
-            onTap: _copyMeetingCode,
-            borderRadius: BorderRadius.circular(6),
-            child: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-              decoration: BoxDecoration(
-                color: AppColors.primary.withValues(alpha: 0.15),
-                borderRadius: BorderRadius.circular(6),
-                border: Border.all(color: AppColors.primary.withValues(alpha: 0.3)),
-              ),
-              child: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Text(
-                    widget.ticket.meeting.meetingCode,
-                    style: const TextStyle(color: AppColors.primaryLight, fontSize: 12, fontWeight: FontWeight.w700, fontFamily: 'monospace'),
-                  ),
-                  const SizedBox(width: 4),
-                  const Icon(Icons.copy, size: 12, color: AppColors.primaryLight),
-                ],
-              ),
-            ),
-          ),
-          const Spacer(),
-          // Audio Route Toggle
-          IconButton(
-            icon: Icon(_isSpeakerPhone ? Icons.volume_up : Icons.phone_in_talk, color: Colors.white, size: 20),
-            onPressed: _toggleAudioRoute,
-            tooltip: _isSpeakerPhone ? strings.speakerOn : strings.earpieceOn,
-          ),
-          // Flip Camera
-          if (!_isCameraOff)
-            IconButton(
-              icon: const Icon(Icons.cameraswitch, color: Colors.white, size: 20),
-              onPressed: _flipCamera,
-              tooltip: strings.switchCamera,
-            ),
-          // Fit / Fill toggle during screen share
-          if (_subStreamUsers.isNotEmpty)
-            IconButton(
-              icon: Icon(
-                _isScreenShareFit ? Icons.fit_screen : Icons.fullscreen,
-                color: Colors.white,
-                size: 20,
-              ),
-              onPressed: () {
-                final sharerId = _subStreamUsers.first;
-                setState(() {
-                  _isScreenShareFit = !_isScreenShareFit;
-                  _trtcCloud?.setRemoteRenderParams(
-                    sharerId,
-                    TRTCVideoStreamType.sub,
-                    TRTCRenderParams(
-                      fillMode: _isScreenShareFit ? TRTCVideoFillMode.fit : TRTCVideoFillMode.fill,
-                      rotation: TRTCVideoRotation.rotation0,
-                    ),
-                  );
-                });
-              },
-              tooltip: _isScreenShareFit ? 'Fit to Screen' : 'Fill Screen',
-            ),
-          // Leave / End button
-          IconButton(
-            icon: const Icon(Icons.call_end, color: AppColors.danger, size: 24),
-            onPressed: _promptLeaveOrEnd,
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildCarouselBody() {
-    final isSharing = _subStreamUsers.isNotEmpty || _isSharingScreen;
-    final sharerId = _subStreamUsers.isNotEmpty ? _subStreamUsers.first : null;
-
-    final allMemberTiles = <Widget>[
-      _buildLocalTile(),
-      ..._remoteParticipants.map((uid) => _buildRemoteTile(uid)),
-    ];
-
-    // Chunk participants into pages of at most 6 (2x3 grid)
-    const pageSize = 6;
-    final participantPages = <Widget>[];
-    for (int i = 0; i < allMemberTiles.length; i += pageSize) {
-      final end = (i + pageSize).clamp(0, allMemberTiles.length);
-      final chunk = allMemberTiles.sublist(i, end);
-      participantPages.add(_buildParticipantGridPage(chunk));
-    }
-    if (participantPages.isEmpty) {
-      participantPages.add(_buildParticipantGridPage(allMemberTiles));
-    }
-
-    final pages = <Widget>[
-      if (isSharing) _buildFullScreenSharePage(sharerId),
-      ...participantPages,
-    ];
-
-    return Column(
-      children: [
-        Expanded(
-          child: PageView(
-            controller: _carouselController,
-            onPageChanged: (page) => setState(() => _currentCarouselPage = page),
-            children: pages,
-          ),
-        ),
-        _buildPageIndicator(pages.length),
-      ],
-    );
-  }
-
-  Widget _buildFullScreenSharePage(String? sharerId) {
-    return Container(
-      color: Colors.black,
-      child: (sharerId != null && !_isExiting)
-          ? TRTCCloudVideoView(
-              key: ValueKey('substream_$sharerId'),
-              onViewCreated: (viewId) {
-                _trtcCloud?.startRemoteView(sharerId, TRTCVideoStreamType.sub, viewId);
-                _trtcCloud?.setRemoteRenderParams(
-                  sharerId,
-                  TRTCVideoStreamType.sub,
-                  TRTCRenderParams(
-                    fillMode: _isScreenShareFit ? TRTCVideoFillMode.fit : TRTCVideoFillMode.fill,
-                    rotation: TRTCVideoRotation.rotation0,
-                  ),
-                );
-              },
-            )
-          : Center(
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Container(
-                    padding: const EdgeInsets.all(24),
-                    decoration: BoxDecoration(
-                      color: AppColors.cyan.withValues(alpha: 0.15),
-                      shape: BoxShape.circle,
-                    ),
-                    child: const Icon(Icons.screen_share, size: 56, color: AppColors.cyan),
-                  ),
-                  const SizedBox(height: 20),
-                  Text(
-                    context.strings.screenShareActive,
-                    style: const TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.w700),
-                  ),
-                  const SizedBox(height: 16),
-                  FilledButton.icon(
-                    style: FilledButton.styleFrom(
-                      backgroundColor: AppColors.danger,
-                      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-                    ),
-                    onPressed: _toggleScreenShare,
-                    icon: const Icon(Icons.stop_screen_share, size: 18),
-                    label: Text(context.strings.stopScreenShare, style: const TextStyle(fontSize: 14)),
-                  ),
-                ],
-              ),
-            ),
-    );
-  }
-
-  Widget _buildParticipantGridPage(List<Widget> tiles) {
-    if (tiles.isEmpty) return const SizedBox.shrink();
-
-    if (tiles.length == 1) {
-      return Center(
-        child: Padding(
-          padding: const EdgeInsets.all(4),
-          child: AspectRatio(
-            aspectRatio: 9 / 16,
-            child: tiles[0],
-          ),
-        ),
-      );
-    }
-
-    if (tiles.length == 2) {
-      return Padding(
-        padding: const EdgeInsets.all(4),
-        child: Column(
-          children: [
-            Expanded(child: tiles[0]),
-            const SizedBox(height: 4),
-            Expanded(child: tiles[1]),
-          ],
-        ),
-      );
-    }
-
-    // 3 to 6 tiles grid (2 columns x up to 3 rows)
-    return GridView.builder(
-      padding: const EdgeInsets.all(4),
-      physics: const NeverScrollableScrollPhysics(),
-      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-        crossAxisCount: 2,
-        crossAxisSpacing: 4,
-        mainAxisSpacing: 4,
-        childAspectRatio: tiles.length <= 4 ? 9 / 14 : 9 / 13,
-      ),
-      itemCount: tiles.length,
-      itemBuilder: (context, index) => tiles[index],
-    );
-  }
-
-  Widget _buildPageIndicator(int totalPages) {
-    if (totalPages <= 1) return const SizedBox.shrink();
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 8, top: 4),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: List.generate(totalPages, (i) {
-          final isActive = i == _currentCarouselPage;
-          return AnimatedContainer(
-            duration: const Duration(milliseconds: 200),
-            margin: const EdgeInsets.symmetric(horizontal: 3),
-            width: isActive ? 16 : 6,
-            height: 6,
-            decoration: BoxDecoration(
-              color: isActive ? AppColors.cyan : Colors.white.withValues(alpha: 0.3),
-              borderRadius: BorderRadius.circular(3),
-            ),
-          );
-        }),
-      ),
-    );
-  }
-
-  Widget _buildLocalTile({bool isCompact = false}) {
-    final myVol = _userVolumeMap[widget.ticket.trtc.userId] ?? 0;
-    final isSpeaking = myVol > 20;
-
-    return Container(
-      decoration: BoxDecoration(
-        color: const Color(0xFF131826),
-        borderRadius: BorderRadius.circular(isCompact ? 8 : 12),
-        border: Border.all(
-          color: isSpeaking ? AppColors.cyan : AppColors.cardBorder,
-          width: isSpeaking ? 2 : 1,
-        ),
-      ),
-      clipBehavior: Clip.antiAlias,
-      child: Stack(
-        children: [
-          // Mount local camera ONLY when camera is ON and chat/exit is NOT open
-          if (!_isCameraOff && !_isChatOpen && !_isExiting)
-            Positioned.fill(
-              child: TRTCCloudVideoView(
-                key: ValueKey('local_camera_view_${isCompact ? "compact" : "grid"}'),
-                onViewCreated: (viewId) {
-                  _localViewId = viewId;
-                  if (_trtcCloud != null) {
-                    _trtcCloud?.startLocalPreview(_isFrontCamera, viewId);
-                    _trtcCloud?.muteLocalVideo(TRTCVideoStreamType.big, false);
-                  }
-                },
-              ),
-            ),
-          // When camera is muted, chat is open, or exiting, show avatar
-          if (_isCameraOff || _isChatOpen || _isExiting)
-            Positioned.fill(
-              child: Container(
-                color: const Color(0xFF131826),
-                child: Center(
-                  child: CircleAvatar(
-                    radius: isCompact ? 18 : 36,
-                    backgroundColor: AppColors.primary.withValues(alpha: 0.2),
-                    child: Text(
-                      widget.displayName.characters.first.toUpperCase(),
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontSize: isCompact ? 14 : 26,
-                        fontWeight: FontWeight.w700,
-                      ),
-                    ),
-                  ),
-                ),
-              ),
-            ),
-          // User label badge
-          Positioned(
-            left: isCompact ? 4 : 8,
-            bottom: isCompact ? 4 : 8,
-            right: isCompact ? 4 : null,
-            child: Container(
-              padding: EdgeInsets.symmetric(horizontal: isCompact ? 4 : 6, vertical: isCompact ? 2 : 3),
-              decoration: BoxDecoration(
-                color: Colors.black.withValues(alpha: 0.65),
-                borderRadius: BorderRadius.circular(4),
-              ),
-              child: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Icon(
-                    _isMicMuted ? Icons.mic_off : Icons.mic,
-                    size: isCompact ? 10 : 12,
-                    color: _isMicMuted ? AppColors.danger : AppColors.cyan,
-                  ),
-                  const SizedBox(width: 3),
-                  Flexible(
-                    child: Text(
-                      '${widget.displayName} (${context.strings.meBadge})${_isHost ? " • ${context.strings.hostBadge}" : ""}',
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontSize: isCompact ? 9 : 11,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildRemoteTile(String userId, {bool isCompact = false}) {
-    final hasVideo = _videoAvailableUsers.contains(userId);
-    final isRemoteMicMuted = !_audioAvailableUsers.contains(userId);
-    final vol = _userVolumeMap[userId] ?? 0;
-    final isSpeaking = vol > 20;
-    final displayName = _getDisplayNameForUser(userId);
-    final initial = displayName.isNotEmpty ? displayName.characters.first.toUpperCase() : '?';
-    final cleanRemote = userId.replaceAll('-', '');
-    final isRemoteHost = cleanRemote == _currentHostUserId;
-
-    return Container(
-      decoration: BoxDecoration(
-        color: const Color(0xFF131826),
-        borderRadius: BorderRadius.circular(isCompact ? 8 : 12),
-        border: Border.all(
-          color: isSpeaking ? AppColors.cyan : AppColors.cardBorder,
-          width: isSpeaking ? 2 : 1,
-        ),
-      ),
-      clipBehavior: Clip.antiAlias,
-      child: Stack(
-        children: [
-          // Mount remote video view ONLY when video is available and chat/exit is not active
-          if (hasVideo && !_isChatOpen && !_isExiting)
-            Positioned.fill(
-              child: TRTCCloudVideoView(
-                key: ValueKey('remote_video_${userId}_${isCompact ? "compact" : "grid"}'),
-                onViewCreated: (viewId) {
-                  _remoteUserViews[userId] = viewId;
-                  _trtcCloud?.startRemoteView(userId, TRTCVideoStreamType.big, viewId);
-                },
-              ),
-            ),
-          if (!hasVideo || _isChatOpen || _isExiting)
-            Positioned.fill(
-              child: Container(
-                color: const Color(0xFF131826),
-                child: Center(
-                  child: CircleAvatar(
-                    radius: isCompact ? 18 : 36,
-                    backgroundColor: AppColors.cyan.withValues(alpha: 0.15),
-                    child: Text(
-                      initial,
-                      style: TextStyle(
-                        color: AppColors.cyan,
-                        fontSize: isCompact ? 14 : 26,
-                        fontWeight: FontWeight.w700,
-                      ),
-                    ),
-                  ),
-                ),
-              ),
-            ),
-          // User label badge
-          Positioned(
-            left: isCompact ? 4 : 8,
-            bottom: isCompact ? 4 : 8,
-            right: isCompact ? 4 : null,
-            child: Container(
-              padding: EdgeInsets.symmetric(horizontal: isCompact ? 4 : 6, vertical: isCompact ? 2 : 3),
-              decoration: BoxDecoration(
-                color: Colors.black.withValues(alpha: 0.65),
-                borderRadius: BorderRadius.circular(4),
-              ),
-              child: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Icon(
-                    isRemoteMicMuted ? Icons.mic_off : Icons.mic,
-                    size: isCompact ? 10 : 12,
-                    color: isRemoteMicMuted ? AppColors.danger : AppColors.cyan,
-                  ),
-                  const SizedBox(width: 3),
-                  Flexible(
-                    child: Text(
-                      '$displayName${isRemoteHost ? " • ${context.strings.hostBadge}" : ""}',
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontSize: isCompact ? 9 : 11,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildBottomControls(AppStrings strings) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 12),
-      color: Colors.black.withValues(alpha: 0.85),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-        children: [
-          // Mic Button
-          Expanded(
-            child: _ControlButton(
-              icon: _isMicMuted ? Icons.mic_off : Icons.mic,
-              label: _isMicMuted ? strings.micOff : strings.micOn,
-              isActive: !_isMicMuted,
-              onPressed: _toggleMic,
-            ),
-          ),
-          // Camera Button
-          Expanded(
-            child: _ControlButton(
-              icon: _isCameraOff ? Icons.videocam_off : Icons.videocam,
-              label: _isCameraOff ? strings.videoOff : strings.videoOn,
-              isActive: !_isCameraOff,
-              onPressed: _toggleCamera,
-            ),
-          ),
-          // Screen Share Button
-          Expanded(
-            child: _ControlButton(
-              icon: _isSharingScreen ? Icons.stop_screen_share : Icons.screen_share,
-              label: _isSharingScreen ? strings.stopScreenShare : strings.startScreenShare,
-              isActive: _isSharingScreen,
-              activeColor: AppColors.cyan,
-              onPressed: _toggleScreenShare,
-            ),
-          ),
-          // Chat Button
-          Expanded(
-            child: _ControlButton(
-              icon: Icons.chat_bubble_outline,
-              label: strings.chatTitle,
-              onPressed: _openChatSheet,
-              hasBadge: _unreadChatCount > 0,
-              badgeCount: _unreadChatCount,
-            ),
-          ),
-          // Members List Button
-          Expanded(
-            child: _ControlButton(
-              icon: Icons.people_outline,
-              label: '${strings.membersTitle} (${_remoteParticipants.length + 1})',
-              onPressed: _showMembersList,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class _ControlButton extends StatelessWidget {
-  const _ControlButton({
-    required this.icon,
-    required this.label,
-    required this.onPressed,
-    this.isActive = false,
-    this.activeColor = AppColors.primary,
-    this.hasBadge = false,
-    this.badgeCount = 0,
-  });
-
-  final IconData icon;
-  final String label;
-  final VoidCallback onPressed;
-  final bool isActive;
-  final Color activeColor;
-  final bool hasBadge;
-  final int badgeCount;
-
-  @override
-  Widget build(BuildContext context) {
-    final bg = isActive ? activeColor.withValues(alpha: 0.2) : Colors.white.withValues(alpha: 0.08);
-    final fg = isActive ? activeColor : Colors.white;
-
-    return InkWell(
-      borderRadius: BorderRadius.circular(10),
-      onTap: onPressed,
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 2, vertical: 4),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Stack(
-              clipBehavior: Clip.none,
-              children: [
-                Container(
-                  padding: const EdgeInsets.all(10),
-                  decoration: BoxDecoration(
-                    color: bg,
-                    shape: BoxShape.circle,
-                    border: Border.all(color: isActive ? activeColor.withValues(alpha: 0.5) : Colors.transparent),
-                  ),
-                  child: Icon(icon, color: fg, size: 20),
-                ),
-                if (hasBadge)
-                  Positioned(
-                    top: 2,
-                    right: 2,
-                    child: Container(
-                      width: 9,
-                      height: 9,
-                      decoration: BoxDecoration(
-                        color: AppColors.danger,
-                        shape: BoxShape.circle,
-                        border: Border.all(
-                          color: const Color(0xFF0F141C),
-                          width: 1.5,
-                        ),
-                      ),
-                    ),
-                  ),
-              ],
-            ),
-            const SizedBox(height: 4),
-            Text(
-              label,
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-              textAlign: TextAlign.center,
-              style: TextStyle(color: fg, fontSize: 10, fontWeight: FontWeight.w600),
-            ),
-          ],
         ),
       ),
     );
