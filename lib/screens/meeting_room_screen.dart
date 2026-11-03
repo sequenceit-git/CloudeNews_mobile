@@ -15,6 +15,7 @@ import '../l10n/app_strings.dart';
 import '../l10n/language_scope.dart';
 import '../models/models.dart';
 import '../services/api_service.dart';
+import '../services/meeting_background_service.dart';
 import '../theme/app_theme.dart';
 import '../widgets/common_widgets.dart';
 import '../widgets/meeting_chat_sheet.dart';
@@ -371,9 +372,13 @@ class _MeetingRoomScreenState extends State<MeetingRoomScreen> {
         onScreenCaptureStarted: () {
           if (!mounted) return;
           setState(() => _isSharingScreen = true);
-      if (_carouselController.hasClients && _currentCarouselPage != 0) {
-        _carouselController.animateToPage(0, duration: const Duration(milliseconds: 300), curve: Curves.easeInOut);
-      }
+          MeetingBackgroundService.update(
+            meetingCode: widget.ticket.meeting.meetingCode,
+            isScreenSharing: true,
+          );
+          if (_carouselController.hasClients && _currentCarouselPage != 0) {
+            _carouselController.animateToPage(0, duration: const Duration(milliseconds: 300), curve: Curves.easeInOut);
+          }
           _broadcastTrtcCommand({
             'action': 'screen_share_started',
             'sharerId': widget.ticket.trtc.userId,
@@ -393,6 +398,10 @@ class _MeetingRoomScreenState extends State<MeetingRoomScreen> {
               _trtcCloud?.muteLocalVideo(TRTCVideoStreamType.big, false);
             }
           });
+          MeetingBackgroundService.update(
+            meetingCode: widget.ticket.meeting.meetingCode,
+            isScreenSharing: false,
+          );
           _broadcastTrtcCommand({
             'action': 'screen_share_stopped',
             'sharerId': widget.ticket.trtc.userId,
@@ -496,6 +505,10 @@ class _MeetingRoomScreenState extends State<MeetingRoomScreen> {
   void _handleEnterRoomSuccess() {
     _isInRoom = true;
     _checkSoloHost();
+    MeetingBackgroundService.start(
+      meetingCode: widget.ticket.meeting.meetingCode,
+      isScreenSharing: _isSharingScreen,
+    );
     if (mounted) setState(() {});
   }
 
@@ -520,6 +533,7 @@ class _MeetingRoomScreenState extends State<MeetingRoomScreen> {
   }
 
   void _cleanUpTRTC() {
+    MeetingBackgroundService.stop();
     if (_isCleanedUp) return;
     _isCleanedUp = true;
     try {
@@ -700,7 +714,7 @@ class _MeetingRoomScreenState extends State<MeetingRoomScreen> {
     _startScreenShareCapture();
   }
 
-  void _startScreenShareCapture() {
+  Future<void> _startScreenShareCapture() async {
     if (_isStartingScreenShare) return;
     _isStartingScreenShare = true;
 
@@ -725,6 +739,13 @@ class _MeetingRoomScreenState extends State<MeetingRoomScreen> {
       );
       if (Platform.isIOS) {
         _trtcCloud?.startScreenCaptureByReplaykit(TRTCVideoStreamType.sub, encParams, 'group.com.cloudnews.app.ios');
+        final pickerShown = await MeetingBackgroundService.showScreenSharePicker();
+        if (!pickerShown) {
+          debugPrint('[TRTC] Screen share picker failed to show');
+          if (mounted) {
+            showWarningSnack(context, 'Please open Control Center, long press Screen Recording, and select CloudMeet');
+          }
+        }
       } else {
         _trtcCloud?.startScreenCapture(0, TRTCVideoStreamType.sub, encParams);
       }
